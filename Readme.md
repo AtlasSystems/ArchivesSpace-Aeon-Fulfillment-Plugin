@@ -1,5 +1,5 @@
-ArchivesSpace Request Fulfillment via Aeon - Version 0.9
-========================================================
+ArchivesSpace Request Fulfillment via Aeon - Updated 20171110
+=============================================================
 This plugin adds a new request button to archival objects that allows researchers to place Aeon requests for archival objects discovered via the ArchivesSpace Public User Interface.
 
 The functionality provided by this plugin is meant to replace the existing Public UI request action functionality for archival objects. As such, it is recommended that the built in functionality be disabled by setting 'AppConfig[:pui_page_actions_request] = false' or by removing ':archival_object' from your 'AppConfig[:pui_requests_permitted_for_types]' setting.  The latter will allow you to use Aeon to fulfill archival_object requests while still allowing other object types to be requested via the default email functionality. By using the 'per repository' configuration options for the built in PUI requesting functionality, it is also possible to configure some repositories to continue using the built in PUI requesting feature for archival objects while allowing other repositories to use Aeon.

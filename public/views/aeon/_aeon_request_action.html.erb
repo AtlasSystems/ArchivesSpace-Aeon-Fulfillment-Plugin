@@ -12,15 +12,20 @@
       if (repo_settings)
         puts "-- Aeon Plugin checking for top containers."
         has_top_container = false
-        container_info = record.build_request_item_container_info
-        container_info.each {|key, value|
-          if key == :top_container_url
-            if ASUtils.wrap(value).any?{|v| !v.blank?}
+
+        unless record['json'].blank? || record['json']['instances'].blank?
+          record['json']['instances'].each do |instance|
+            sub_container = instance.dig('sub_container')
+
+            next if sub_container.nil?
+
+            top_container_uri = sub_container.dig('top_container', 'ref');
+
+            if (!top_container_uri.blank?)
               has_top_container = true
-              break
             end
           end
-        }
+        end
 
         only_top_containers = (repo_settings.include?(:requests_permitted_for_containers_only) ? repo_settings[:requests_permitted_for_containers_only] : false)
 
@@ -93,8 +98,7 @@
       <% instances = json.fetch('instances')  %>
       <% if instances %>
         <% instanceCount = 0 %>
-        <% instances.each do |instance| %>
-          <%= debug instance %>
+        <% instances.each do |instance| %>      
           <% if !instance['digital_object'] %>
             <% instanceCount += 1 %>
             <input type='hidden' name='Request' value='<%= instanceCount %>' />

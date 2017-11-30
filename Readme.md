@@ -35,7 +35,7 @@ AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url]
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label]  
 
 # Specifies whether requests are limited to resources with top containers only. Default is false.
-AppConfig[:aeon_fulfillment]['{repo_code}'][:requests_permitted_for_containers_only]] 
+AppConfig[:aeon_fulfillment]['{repo_code}'][:requests_permitted_for_containers_only]
 
 # The system ID to match fields against in Aeon's OpenURLMapping table.
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_external_system_id] 

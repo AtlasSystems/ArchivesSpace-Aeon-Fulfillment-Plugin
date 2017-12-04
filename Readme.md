@@ -1,4 +1,4 @@
-ArchivesSpace Request Fulfillment via Aeon - Updated 20171110
+ArchivesSpace Request Fulfillment via Aeon - Updated 20171204
 =============================================================
 This plugin adds a new request button to archival objects that allows researchers to place Aeon requests for archival objects discovered via the ArchivesSpace Public User Interface.
 

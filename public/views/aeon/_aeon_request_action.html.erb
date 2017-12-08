@@ -44,9 +44,9 @@
   <%= form_tag "#{repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
     <% if repo_settings[:aeon_external_system_id].blank? %>
       <input type="hidden" name="SystemID" value="ArchivesSpace" />
-    <% else -%>
+    <% else %>
       <input type='hidden' name='SystemID' value='<%= repo_settings[:aeon_external_system_id] %>' />
-    <% end -%>
+    <% end %>
 
     <% if !AppConfig[:public_proxy_url].blank? %>
       <input type='hidden' name='ReturnLinkURL' value='<%= "#{AppConfig[:public_proxy_url]}#{record['uri']}" %>' />

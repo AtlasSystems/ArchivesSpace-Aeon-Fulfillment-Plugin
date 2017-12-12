@@ -1,21 +1,53 @@
-<% mapper = ArchivalObjectMapper.new(record) %>
+<%
+mapper = case record
+  when ArchivalObject
+    ArchivalObjectMapper.new(record)
+  when Accession
+    AccessionMapper.new(record)
+  else
+    puts record.inspect
+    raise "This ArchivesSpace object type is not supported"
+  end
+%>
+
 
 <% if mapper.show_action? %>
-  <%= form_tag "#{repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
-    
+  <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
+
     <% mapper.map.each do |name, value| %>
-      <input type='hidden' name='<%= name %>' value='<%= value %>' />
+      <% if name.casecmp('requests').zero? %>
+        <% value.each do |request| %>
+          <% request.each do |request_param, request_value| %>
+            <input type='hidden' name='<%= request_param %>' value='<%= request_value %>' />
+          <% end %>
+        <% end %>
+      <% else %>
+        <input type='hidden' name='<%= name %>' value='<%= value %>' />
+      <% end %>
     <% end %>
 
-    <button type="submit" class="btn page_action request  btn-default" title="<%= t('actions.request') %>">
-      <i class="fa fa-bullhorn fa-3x"></i><br/><%= t('actions.request') %>
+    <button type="submit" class="btn page_action request btn-default" title="<%= t('aeon_fulfillment.request_record') %>">
+      <i class="fa fa-external-link fa-3x"></i><br/><%= t('aeon_fulfillment.request_record') %>
     </button>
-
   <% end %>
+
 <% else %>
 
   <button class="btn btn-default page_action request" disabled="true">
-    <i class="fa fa-bullhorn fa-3x"></i><br/><%= t('actions.request') %>
+    <i class="fa fa-external-link fa-3x"></i><br/><%= t('aeon_fulfillment.request_record') %>
   </button>
 
 <% end %>
+
+<!-- TODO: DEBUGGING FEATURE PLEASE REMOVE AFTER DEVELOPMENT -->
+
+
+<button class="btn btn-default page_action request" title="record.inspect" data-toggle="collapse" data-target="#record-inspect" aria-expanded="false" aria-controls="record-inspect">
+    <i class="fa fa-compress fa-3x"></i><br/>Inspect
+</button>
+
+<div id="record-inspect" class="collapse">
+  <div class="card card-block">
+    <%= record.inspect %>
+  </div>
+</div>

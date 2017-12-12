@@ -23,7 +23,7 @@ AppConfig[:plugins] = << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {}
 AppConfig[:aeon_fulfillment]['atlas'] = {}
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_web_url] = "https://your.institution.edu/aeon/"
-AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace" 
+AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace"
 ```
 
 **All Aeon Fulfillment Plugin Specific Configuration Options**
@@ -32,17 +32,17 @@ AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace"
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url]
 
 # (required) The text to display on the button that takes users back to ArchivesSpace
-AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label]  
+AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label]
 
 # Specifies whether requests are limited to resources with top containers only. Default is false.
 AppConfig[:aeon_fulfillment]['{repo_code}'][:requests_permitted_for_containers_only]
 
 # The system ID to match fields against in Aeon's OpenURLMapping table.
-AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_external_system_id] 
+AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_external_system_id]
 ```
 
 **Fields imported from the resource (Incomplete list)**
-- uri 
+- uri
 - identifier
 - component_id
 - title

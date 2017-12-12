@@ -1,0 +1,4 @@
+en:
+  aeon_fulfillment:
+    request_record: Aeon Request
+    requesting_disabled: This record is not a container.

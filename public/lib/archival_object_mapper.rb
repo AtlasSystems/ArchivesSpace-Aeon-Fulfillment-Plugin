@@ -5,7 +5,7 @@ class ArchivalObjectMapper < RecordMapper
     end
 
 
-
+    # Override for RecordMapper json_fields method. 
     def json_fields
         mappings = super
 
@@ -14,7 +14,10 @@ class ArchivalObjectMapper < RecordMapper
             return mappings
         end 
 
-        mappings['repository_processing_note'] = json['repository_processing_note']
+        if json['repository_processing_note'] && !json['repository_processing_note'].blank?
+            mappings['repository_processing_note'] = json['repository_processing_note']
+        end
+
         return mappings
     end
 
@@ -24,6 +27,7 @@ class ArchivalObjectMapper < RecordMapper
         mappings = super
 
         mappings['component_id'] = self.record['component_id']
+
 
         return mappings
     end

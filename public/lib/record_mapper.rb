@@ -126,7 +126,7 @@ class RecordMapper
 
         if json['notes']
             json['notes'].each do |note|
-                if note['type'] == 'physloc' and note['content'].length > 0
+                if note['type'] == 'physloc' and !note['content'].blank?
                     mappings['physical_location_note'] = note['content'].map { |cont| "#{cont}" }.join("; ")
                 end
             end
@@ -192,7 +192,7 @@ class RecordMapper
             mappings['requests'] << request
         end
 
-        return mappings
+        mappings
     end
 
     protected :json_fields

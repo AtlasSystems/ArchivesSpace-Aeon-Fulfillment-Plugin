@@ -1,32 +1,54 @@
-ArchivesSpace Request Fulfillment via Aeon - Updated 20171204
-=============================================================
-This plugin adds a new request button to archival objects that allows researchers to place Aeon requests for archival objects discovered via the ArchivesSpace Public User Interface.
+# ArchivesSpace Request Fulfillment via Aeon - Updated 20171204
 
-The functionality provided by this plugin is meant to replace the existing Public UI request action functionality for archival objects. As such, it is recommended that the built in functionality be disabled by setting 'AppConfig[:pui_page_actions_request] = false' or by removing ':archival_object' from your 'AppConfig[:pui_requests_permitted_for_types]' setting.  The latter will allow you to use Aeon to fulfill archival_object requests while still allowing other object types to be requested via the default email functionality. By using the 'per repository' configuration options for the built in PUI requesting functionality, it is also possible to configure some repositories to continue using the built in PUI requesting feature for archival objects while allowing other repositories to use Aeon.
+This plugin adds a new request button to archival objects that allows 
+researchers to place Aeon requests for archival objects discovered via the 
+ArchivesSpace Public User Interface. 
 
-**Add the following after your list of plugins has been initialized**
+The functionality provided by this plugin is meant to replace the existing 
+Public UI request action functionality for archival objects. As such, it is 
+recommended that the built in functionality be disabled by setting 
+`AppConfig[:pui_page_actions_request] = false` or by removing `:archival_object` from your `AppConfig[:pui_requests_permitted_for_types]` 
+setting. The latter will allow you to use Aeon to fulfill archival_object 
+requests while still allowing other object types to be requested via the 
+default email functionality. By using the 'per repository' configuration 
+options for the built in PUI requesting functionality, it is also possible to 
+configure some repositories to continue using the built in PUI requesting 
+feature for archival objects while allowing other repositories to use Aeon. 
+
+
+## Configuring Addon Settings
+
+Add the following after your list of plugins has been initialized.
+
 ```ruby
-AppConfig[:plugins] = << 'aeon_fulfillment'
+AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {}
 ```
 
-**Add the following settings and appropriate values for EACH repository that will use the plugin.  Replace '{repo_code}' with the appropriate repository code (also known as a short name) for the repository (lower-cased).**
+Add the following settings and appropriate values for EACH repository that 
+will use the plugin. Replace `{repo_code}` with the appropriate repository 
+code (also known as a short name) for the repository (lower-cased). 
+
 ```ruby
 AppConfig[:aeon_fulfillment]['{repo_code}'] = {}
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url] = "{Your aeon web url}"
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label] = "{The text for the return link from Aeon}"
 ```
 
-For example, to configure the addon for a repository with a code of "ATLAS" add the following to config.rb
+For example, to configure the addon for a repository with a code of "ATLAS" 
+add the following to `config.rb`.
+
 ```ruby
-AppConfig[:plugins] = << 'aeon_fulfillment'
+AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {}
 AppConfig[:aeon_fulfillment]['atlas'] = {}
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_web_url] = "https://your.institution.edu/aeon/"
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace"
 ```
 
-**All Aeon Fulfillment Plugin Specific Configuration Options**
+
+## All Aeon Fulfillment Plugin Specific Configuration Options
+
 ```ruby
 # (required) The URL to your Aeon web site
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url]
@@ -41,7 +63,11 @@ AppConfig[:aeon_fulfillment]['{repo_code}'][:requests_permitted_for_containers_o
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_external_system_id]
 ```
 
-**Fields imported from the resource (Incomplete list)**
+
+## Fields Imported from the Resource
+
+(Incomplete list)
+
 - uri
 - identifier
 - component_id
@@ -51,9 +77,12 @@ AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_external_system_id]
 - publish
 - creator (as a semi-colon separated string list)
 
-Recommended OpenURL Mappings
-```sql
 
+## Recommended OpenURL Mappings
+
+Below is an incomplete list of Open URL mappings that should be set in Aeon.
+
+```sql
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemDate', '<#created_date>|<#Created_date>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemTitle', '<#title>', 'NULL');

@@ -1,4 +1,6 @@
 <%
+puts "-- Initializing Aeon Plugin..."
+
 mapper = case record
   when ArchivalObject
     ArchivalObjectMapper.new(record)
@@ -38,6 +40,8 @@ mapper = case record
   </button>
 
 <% end %>
+
+<% puts "-- Finished initializing Aeon plugin." %>
 
 <!-- TODO: DEBUGGING FEATURE PLEASE REMOVE AFTER DEVELOPMENT -->
 

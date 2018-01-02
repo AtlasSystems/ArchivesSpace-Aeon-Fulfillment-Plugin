@@ -1,5 +1,7 @@
 <%
-puts "-- Initializing Aeon Plugin..."
+logger = Rails.logger
+
+logger.debug "Initializing Aeon Plugin..."
 
 mapper = case record
   when ArchivalObject
@@ -7,11 +9,12 @@ mapper = case record
   when Accession
     AccessionMapper.new(record)
   else
-    puts record.inspect
-    raise "This ArchivesSpace object type is not supported"
+    message = "This ArchivesSpace object type is not supported by this plugin."
+    logger.error record.inspect
+    logger.error message
+    raise message
   end
 %>
-
 
 <% if mapper.show_action? %>
   <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
@@ -41,10 +44,11 @@ mapper = case record
 
 <% end %>
 
-<% puts "-- Finished initializing Aeon plugin." %>
+<% 
+  logger.debug "Finished initializing Aeon plugin." 
+%>
 
 <!-- TODO: DEBUGGING FEATURE PLEASE REMOVE AFTER DEVELOPMENT -->
-
 
 <button class="btn btn-default page_action request" title="record.inspect" data-toggle="collapse" data-target="#record-inspect" aria-expanded="false" aria-controls="record-inspect">
     <i class="fa fa-compress fa-3x"></i><br/>Inspect

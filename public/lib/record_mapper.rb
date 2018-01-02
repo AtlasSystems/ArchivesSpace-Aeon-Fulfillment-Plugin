@@ -6,6 +6,10 @@ class RecordMapper
         @record = record
     end
 
+    def logger
+        Rails.logger
+    end
+
     def repo_code
         self.record.resolved_repository.dig('repo_code').downcase
     end
@@ -16,12 +20,16 @@ class RecordMapper
 
     def show_action?
         begin
-            if self.repo_settings
+            logger.debug "Checking for plugin settings for the repository"
 
-                puts "-- Aeon Plugin checking for top containers."
+            if !self.repo_settings
+                logger.debug "Could not find plugin settings for the repository: \"#{self.repo_code}\"."
+            else
+                logger.debug "Checking for top containers"
                 has_top_container = false
 
-                if self.record['json'].present? && self.record['json']['instances'].present?
+                instances = self.record.dig('json', 'instances')
+                if instances
                     self.record['json']['instances'].each do |instance|
 
                         sub_container = instance.dig('sub_container')
@@ -29,7 +37,7 @@ class RecordMapper
 
                         top_container_uri = sub_container.dig('top_container', 'ref')
 
-                        if top_container_uri && !top_container_uri.blank?
+                        if top_container_uri.present?
                             has_top_container = true
                         end
                     end
@@ -37,16 +45,16 @@ class RecordMapper
 
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
 
-                puts "-- Aeon Plugin Containers found? #{has_top_container}"
-                puts "-- Aeon Plugin only_top_containers? #{only_top_containers}"
+                logger.debug "Containers found?    #{has_top_container}"
+                logger.debug "only_top_containers? #{only_top_containers}"
 
                 return (has_top_container || !only_top_containers)
             end
 
         rescue Exception => e
-            puts "Failed to create Aeon Request action."
-            puts e.message
-            puts e.backtrace.inspect
+            logger.error "Failed to create Aeon Request action."
+            logger.error e.message
+            logger.error e.backtrace.inspect
 
         end
 
@@ -192,8 +200,8 @@ class RecordMapper
             mappings['requests'] << request
         end
 
-        mappings
+        return mappings
     end
 
-    protected :json_fields
+    protected :json_fields, :logger
 end

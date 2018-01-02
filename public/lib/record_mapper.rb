@@ -30,7 +30,7 @@ class RecordMapper
 
                 instances = self.record.dig('json', 'instances')
                 if instances
-                    self.record['json']['instances'].each do |instance|
+                    instances.each do |instance|
 
                         sub_container = instance.dig('sub_container')
                         next if !sub_container
@@ -66,6 +66,19 @@ class RecordMapper
     def map
         mappings = {}
 
+        mappings = mappings
+            .merge(self.system_information)
+            .merge(self.json_fields)
+            .merge(self.record_fields)
+
+        return mappings
+    end
+
+
+    # Pulls data from AppConfig and ASpace System
+    def system_information
+        mappings = {}
+        
         mappings['SystemID'] =
             if (!self.repo_settings[:aeon_external_system_id].blank?)
                 self.repo_settings[:aeon_external_system_id]
@@ -91,13 +104,23 @@ class RecordMapper
                 "ArchivesSpace"
             end
 
-        # Merge in data from self.record.json
-        mappings = mappings.merge(self.json_fields)
+        mappings['repo_name'] = 
 
-        # Data pulled from self.record and self.record.raw
+        return mappings
+    end
+
+
+    # Pulls data from self.record
+    def record_fields
+        mappings = {}
+
         mappings['identifier'] = self.record.identifier || self.record['identifier']
         mappings['level'] = self.record.level || self.record['level']
         mappings['uri'] = self.record.uri || self.record['uri']
+
+        mappings['language'] ||= self.record['language']
+        mappings['publish'] = self.record['publish']
+        mappings['title'] = self.record['title']
 
         resolved_resource = self.record['_resolved_resource'] || self.record.resolved_resource
         if resolved_resource
@@ -108,12 +131,30 @@ class RecordMapper
             end
         end
 
-        mappings['language'] ||= self.record['language']
-        mappings['publish'] = self.record['publish']
-        mappings['title'] = self.record['title']
+        resolved_repository = self.record.resolved_repository
+        if resolved_repository
+            mappings['repo_code'] = resolved_repository['repo_code']
+            mappings['repo_name'] = resolved_repository['name']
+        end
 
         if record['creators']
-            mappings['creators'] = self.record['creators'].map { |k| "#{k}" }.join("; ")
+            mappings['creators'] = self.record['creators']
+                .select { |cr| cr.present? }
+                .map { |cr| cr.strip }
+                .join("; ")
+        end
+
+        if record.notes
+            accessrestrict = record.notes['accessrestrict']
+            if accessrestrict
+                arSubnotes = accessrestrict['subnotes']
+                if arSubnotes
+                    mappings['accessrestrict'] = arSubnotes
+                        .select { |arSubnote| arSubnote['content'].present? }
+                        .map { |arSubnote| arSubnote['content'].strip }
+                        .join("; ")
+                end
+            end
         end
 
         return mappings
@@ -154,54 +195,54 @@ class RecordMapper
             return mappings
         end
 
-        mappings['requests'] = []
+        mappings['requests'] = instances
+            .select{ |instance| !instance['digital_object'] }
+            .each_with_index
+            .map { |instance, i|
+                request = {}
 
-        instance_count = 0
-        instances.each do |instance|
-            next if instance['digital_object']
-            request = {}
+                instance_count = i + 1
 
-            instance_count += 1
+                request['Request'] = "#{instance_count}"
 
-            request['Request'] = "#{instance_count}"
+                request["instance_is_representative_#{instance_count}"] = instance['is_representative']
+                request["instance_last_modified_by_#{instance_count}"] = instance['last_modified_by']
+                request["instance_instance_type_#{instance_count}"] = instance['instance_type']
+                request["instance_created_by_#{instance_count}"] = instance['created_by']
 
-            request["instance_is_representative_#{instance_count}"] = instance['is_representative']
-            request["instance_last_modified_by_#{instance_count}"] = instance['last_modified_by']
-            request["instance_instance_type_#{instance_count}"] = instance['instance_type']
-            request["instance_created_by_#{instance_count}"] = instance['created_by']
+                request['instance_container_grandchild_indicator'] = instance['indicator_3']
+                request['instance_container_child_indicator'] = instance['indicator_2']
+                request['instance_container_grandchild_type'] = instance['type_3']
+                request['instance_container_child_type'] = instance['type_2']
 
-            request['instance_container_grandchild_indicator'] = instance['indicator_3']
-            request['instance_container_child_indicator'] = instance['indicator_2']
-            request['instance_container_grandchild_type'] = instance['type_3']
-            request['instance_container_child_type'] = instance['type_2']
+                container = instance['sub_container']
+                if container
+                    request["instance_container_last_modified_by_#{instance_count}"] = container['last_modified_by']
+                    request["instance_container_created_by_#{instance_count}"] = container['created_by']
 
-            container = instance['sub_container']
-            if container
-                request["instance_container_last_modified_by_#{instance_count}"] = container['last_modified_by']
-                request["instance_container_created_by_#{instance_count}"] = container['created_by']
+                    top_container = container['top_container']
+                    if top_container
+                        request["instance_top_container_uri_#{instance_count}"] = top_container['uri']
 
-                top_container = container['top_container']
-                if top_container
-                    request["instance_top_container_uri_#{instance_count}"] = top_container['uri']
-
-                    top_container_resolved = top_container['_resolved']
-                    if top_container_resolved
-                        request["instance_top_container_long_display_string_#{instance_count}"] = top_container_resolved['long_display_string']
-                        request["instance_top_container_last_modified_by_#{instance_count}"] = top_container_resolved['last_modified_by']
-                        request["instance_top_container_display_string_#{instance_count}"] = top_container_resolved['display_string']
-                        request["instance_top_container_restricted_#{instance_count}"] = top_container_resolved['restricted']
-                        request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
-                        request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
-                        request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
+                        top_container_resolved = top_container['_resolved']
+                        if top_container_resolved
+                            request["instance_top_container_long_display_string_#{instance_count}"] = top_container_resolved['long_display_string']
+                            request["instance_top_container_last_modified_by_#{instance_count}"] = top_container_resolved['last_modified_by']
+                            request["instance_top_container_display_string_#{instance_count}"] = top_container_resolved['display_string']
+                            request["instance_top_container_restricted_#{instance_count}"] = top_container_resolved['restricted']
+                            request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
+                            request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
+                            request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
+                        end
                     end
                 end
-            end
 
-            mappings['requests'] << request
-        end
+                return request
+            }
 
         return mappings
     end
 
-    protected :json_fields, :logger
+
+    protected :json_fields, :record_fields, :system_information, :logger
 end

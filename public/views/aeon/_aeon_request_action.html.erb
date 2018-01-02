@@ -31,15 +31,15 @@ mapper = case record
       <% end %>
     <% end %>
 
-    <button type="submit" class="btn page_action request btn-default" title="<%= t('aeon_fulfillment.request_record') %>">
-      <i class="fa fa-external-link fa-3x"></i><br/><%= t('aeon_fulfillment.request_record') %>
+    <button type="submit" class="btn page_action request btn-default" title="<%= t('plugins.aeon_fulfillment.request_button_label') %>">
+      <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
     </button>
   <% end %>
 
 <% else %>
 
   <button class="btn btn-default page_action request" disabled="true">
-    <i class="fa fa-external-link fa-3x"></i><br/><%= t('aeon_fulfillment.request_record') %>
+    <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
   </button>
 
 <% end %>

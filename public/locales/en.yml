@@ -1,4 +1,5 @@
 en:
-  aeon_fulfillment:
-    request_record: Aeon Request
-    requesting_disabled: This record is not a container.
+  plugins:
+    aeon_fulfillment:
+      request_button_label: Aeon Request
+      requesting_disabled: This record cannot be sent in a request. 

@@ -1,7 +1,5 @@
 <%
-logger = Rails.logger
-
-logger.debug "Initializing Aeon Plugin..."
+puts "Aeon Fulfillment Plugin -- Initializing Plugin..."
 
 mapper = case record
   when ArchivalObject
@@ -9,16 +7,15 @@ mapper = case record
   when Accession
     AccessionMapper.new(record)
   else
-    message = "This ArchivesSpace object type is not supported by this plugin."
-    logger.error record.inspect
-    logger.error message
+    message = "Aeon Fulfillment Plugin -- This ArchivesSpace object type is not supported by this plugin."
+    puts record.inspect
+    puts message
     raise message
   end
 %>
 
 <% if mapper.show_action? %>
   <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
-
     <% mapper.map.each do |name, value| %>
       <% if name.casecmp('requests').zero? %>
         <% value.each do |request| %>
@@ -45,20 +42,5 @@ mapper = case record
 <% end %>
 
 <% 
-  logger.debug "Finished initializing Aeon plugin." 
+  puts "Aeon Fulfillment Plugin -- Finished initializing plugin." 
 %>
-
-<!-- TODO: DEBUGGING FEATURE PLEASE REMOVE AFTER DEVELOPMENT -->
-
-<button class="btn btn-default page_action request" title="record.inspect" data-toggle="collapse" data-target="#record-inspect" aria-expanded="false" aria-controls="record-inspect">
-    <i class="fa fa-compress fa-3x"></i><br/>Inspect
-</button>
-
-<div id="record-inspect" class="collapse">
-  <div class="card card-block card_block">
-    <%= @result.inspect %>
-  </div>
-    <div class="card card-block card_block">
-    <%= record.inspect %>
-  </div>
-</div>

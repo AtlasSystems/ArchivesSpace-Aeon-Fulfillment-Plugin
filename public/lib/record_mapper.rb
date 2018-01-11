@@ -6,10 +6,6 @@ class RecordMapper
         @record = record
     end
 
-    def logger
-        Rails.logger
-    end
-
     def repo_code
         self.record.resolved_repository.dig('repo_code').downcase
     end
@@ -20,12 +16,12 @@ class RecordMapper
 
     def show_action?
         begin
-            logger.debug "Checking for plugin settings for the repository"
+            puts "Aeon Fulfillment Plugin -- Checking for plugin settings for the repository"
 
             if !self.repo_settings
-                logger.debug "Could not find plugin settings for the repository: \"#{self.repo_code}\"."
+                puts "Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\"."
             else
-                logger.debug "Checking for top containers"
+                puts "Aeon Fulfillment Plugin -- Checking for top containers"
                 has_top_container = false
 
                 instances = self.record.dig('json', 'instances')
@@ -45,16 +41,16 @@ class RecordMapper
 
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
 
-                logger.debug "Containers found?    #{has_top_container}"
-                logger.debug "only_top_containers? #{only_top_containers}"
+                puts "Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}"
+                puts "Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}"
 
                 return (has_top_container || !only_top_containers)
             end
 
         rescue Exception => e
-            logger.error "Failed to create Aeon Request action."
-            logger.error e.message
-            logger.error e.backtrace.inspect
+            puts "Aeon Fulfillment Plugin -- Failed to create Aeon Request action."
+            puts e.message
+            puts e.backtrace.inspect
 
         end
 
@@ -104,8 +100,6 @@ class RecordMapper
                 "ArchivesSpace"
             end
 
-        mappings['repo_name'] = 
-
         return mappings
     end
 
@@ -115,12 +109,10 @@ class RecordMapper
         mappings = {}
 
         mappings['identifier'] = self.record.identifier || self.record['identifier']
-        mappings['level'] = self.record.level || self.record['level']
-        mappings['uri'] = self.record.uri || self.record['uri']
-
-        mappings['language'] ||= self.record['language']
         mappings['publish'] = self.record['publish']
+        mappings['level'] = self.record.level || self.record['level']
         mappings['title'] = self.record['title']
+        mappings['uri'] = self.record.uri || self.record['uri']
 
         resolved_resource = self.record['_resolved_resource'] || self.record.resolved_resource
         if resolved_resource
@@ -182,9 +174,14 @@ class RecordMapper
         end
 
         if json['dates']
-            json['dates'].each do |date|
-                mappings["#{date['label']}_date"] = date['expression']
-            end
+            json['dates']
+                .select { |date| date['expression'].present? }
+                .group_by { |date| date['label'] }
+                .each { |label, dates|
+                    mappings["#{label}_date"] = dates
+                        .map { |date| date['expression'] }
+                        .join("; ")
+                }
         end
 
         mappings['restrictions_apply'] = json['restrictions_apply']
@@ -210,10 +207,10 @@ class RecordMapper
                 request["instance_instance_type_#{instance_count}"] = instance['instance_type']
                 request["instance_created_by_#{instance_count}"] = instance['created_by']
 
-                request['instance_container_grandchild_indicator'] = instance['indicator_3']
-                request['instance_container_child_indicator'] = instance['indicator_2']
-                request['instance_container_grandchild_type'] = instance['type_3']
-                request['instance_container_child_type'] = instance['type_2']
+                request["instance_container_grandchild_indicator_#{instance_count}"] = instance['indicator_3']
+                request["instance_container_child_indicator_#{instance_count}"] = instance['indicator_2']
+                request["instance_container_grandchild_type_#{instance_count}"] = instance['type_3']
+                request["instance_container_child_type_#{instance_count}"] = instance['type_2']
 
                 container = instance['sub_container']
                 if container
@@ -244,5 +241,5 @@ class RecordMapper
     end
 
 
-    protected :json_fields, :record_fields, :system_information, :logger
+    protected :json_fields, :record_fields, :system_information
 end

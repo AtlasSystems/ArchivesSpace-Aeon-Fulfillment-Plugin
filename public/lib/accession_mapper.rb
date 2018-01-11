@@ -5,16 +5,18 @@ class AccessionMapper < RecordMapper
     end
 
     # Returns a hash that maps from Aeon OpenURL values to values in the provided record.
-    def map
+    def record_fields
         mappings = super
 
-        if record.use_restrictions_note && !record.use_restrictions_note.blank?
+        if record.use_restrictions_note && record.use_restrictions_note.present?
             mappings['use_restrictions_note'] = record.use_restrictions_note
         end
 
-        if record.access_restrictions_note && !record.access_restrictions_note.blank?
+        if record.access_restrictions_note && record.access_restrictions_note.present?
             mappings['access_restrictions_note'] = record.access_restrictions_note
         end
+
+        mappings['language'] = self.record['language']
 
         return mappings
     end

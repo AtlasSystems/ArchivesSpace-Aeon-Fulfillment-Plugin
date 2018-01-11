@@ -11,8 +11,8 @@
     1. [Table of Contents](#table-of-contents)
     2. [Overview](#overview)
     3. [Changelog](#changelog)
-    4. [Configuring Addon Settings](#configuring-addon-settings)
-        1. [All Aeon Fulfillment Plugin Specific Configuration Options](#all-aeon-fulfillment-plugin-specific-configuration-options)
+    4. [Configuring Plugin Settings](#configuring-plugin-settings)
+        1. [All Aeon Fulfillment Plugin Configuration Options](#all-aeon-fulfillment-plugin-configuration-options)
         2. [Example Configuration](#example-configuration)
     5. [Imported Fields](#imported-fields)
         1. [Common Fields](#common-fields)
@@ -38,14 +38,14 @@ options for the built in PUI requesting functionality, it is also possible to
 configure some repositories to continue using the built in PUI requesting 
 feature for archival objects while allowing other repositories to use Aeon. 
 
-This addon has been tested on version 2.2.0 of ArchivesSpace. Future releases 
-of ArchivesSpace may cause changes in the functionality of this addon. 
+This plugin has been tested on version 2.2.0 of ArchivesSpace. Future releases 
+of ArchivesSpace may cause changes in the functionality of this plugin. 
 
 
 ## Changelog
 
 - **20170809** 
-    - Initial release of ArchivesSpace addon. 
+    - Initial release of this ArchivesSpace plugin
     - Added support for sending requests for Archival Objects to Aeon 
 - **20171110**
     - Added readme to include configuration resources
@@ -59,9 +59,9 @@ of ArchivesSpace may cause changes in the functionality of this addon.
     - Bug fixes
 
 
-## Configuring Addon Settings
+## Configuring Plugin Settings
 
-In order to configure this addon, you will need to modify the 
+In order to configure this plugin, you will need to modify the 
 `config/config.rb` file of your ArchivesSpace installation. To enable the 
 plugin, you will need to add the following to the configuration file. 
 
@@ -82,7 +82,7 @@ AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url] = "{Your aeon web url
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label] = "{The text for the return link from Aeon}"
 ```
 
-For example, to configure the addon for a repository that has the short name 
+For example, to configure the plugin for a repository that has the short name 
 "ATLAS", add the following to `config.rb`. 
 
 ```ruby
@@ -110,11 +110,10 @@ AppConfig[:aeon_fulfillment] = {
 }
 ```
 
-
-### All Aeon Fulfillment Plugin Specific Configuration Options
+### All Aeon Fulfillment Plugin Configuration Options
 
 - **:aeon\_web\_url**. (Required). This setting specifies the web url that 
-  points to an Aeon installation. The addon will send requests to this url, 
+  points to an Aeon installation. The plugin will send requests to this url, 
   after adding the external requests endpoint (`aeon.dll?action=11&type=200`) 
   to the end. 
 
@@ -129,7 +128,6 @@ AppConfig[:aeon_fulfillment] = {
   is used by Aeon to determine which mapping rules to use from its 
   OpenURLMapping table. Each repository configuration can have their own 
   System ID or they can have a duplicate System ID. 
-
 
 ### Example Configuration
 
@@ -155,7 +153,7 @@ AppConfig[:aeon_fulfillment] = {
 
 ## Imported Fields
 
-This addon builds a form that is sent to Aeon through the external requests 
+This plugin builds a form that is sent to Aeon through the external requests 
 (`aeon.dll?action=11&type=200`) endpoint of your Aeon installation. Below are 
 the names of the fields as they will appear in the request. 
 

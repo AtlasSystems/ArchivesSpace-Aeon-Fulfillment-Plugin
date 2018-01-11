@@ -1,0 +1,5 @@
+en:
+  plugins:
+    aeon_fulfillment:
+      request_button_label: Aeon Request
+      requesting_disabled: This record cannot be sent in a request. 

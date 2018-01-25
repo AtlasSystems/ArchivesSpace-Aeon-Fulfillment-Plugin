@@ -230,6 +230,33 @@ class RecordMapper
                             request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
                             request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
                             request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
+
+                            collection = top_container_resolved['collection']
+                            if collection
+                                request["instance_top_container_collection_identifier_#{instance_count}"] = collection
+                                    .select { |c| c['identifier'].present? }
+                                    .map { |c| c['identifier'] }
+                                    .join("; ")
+
+                                request["instance_top_container_collection_display_string_#{instance_count}"] = collection
+                                    .select { |c| c['display_string'].present? }
+                                    .map { |c| c['display_string'] }
+                                    .join("; ")
+                            end
+
+                            series = top_container_resolved['series']
+                            if series
+                                request["instance_top_container_series_identifier_#{instance_count}"] = series
+                                    .select { |s| s['identifier'].present? }
+                                    .map { |s| s['identifier'] }
+                                    .join("; ")
+
+                                request["instance_top_container_series_display_string_#{instance_count}"] = series
+                                    .select { |s| s['display_string'].present? }
+                                    .map { |s| s['display_string'] }
+                                    .join("; ")
+                            end
+
                         end
                     end
                 end

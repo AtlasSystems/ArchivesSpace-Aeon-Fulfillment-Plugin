@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180111
+**Version:** 20180125
 
-**Last Updated:** January 11, 2018
+**Last Updated:** January 25, 2018
 
 
 ## Table of Contents

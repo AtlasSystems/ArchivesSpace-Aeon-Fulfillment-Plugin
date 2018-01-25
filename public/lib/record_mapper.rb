@@ -219,7 +219,7 @@ class RecordMapper
 
                     top_container = container['top_container']
                     if top_container
-                        request["instance_top_container_uri_#{instance_count}"] = top_container['uri']
+                        request["instance_top_container_ref_#{instance_count}"] = top_container['ref']
 
                         top_container_resolved = top_container['_resolved']
                         if top_container_resolved
@@ -230,6 +230,7 @@ class RecordMapper
                             request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
                             request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
                             request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
+                            request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
                             collection = top_container_resolved['collection']
                             if collection

@@ -229,6 +229,7 @@ class RecordMapper
                             request["instance_top_container_restricted_#{instance_count}"] = top_container_resolved['restricted']
                             request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
                             request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
+                            request["instance_top_container_barcode_#{instance_count}"] = top_container_resolved['barcode']
                             request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                             request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 

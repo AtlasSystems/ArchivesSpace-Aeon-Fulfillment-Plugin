@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180111
+**Version:** 20180125
 
-**Last Updated:** January 11, 2018
+**Last Updated:** January 25, 2018
 
 
 ## Table of Contents
@@ -215,6 +215,7 @@ and the values of each may differ from instance to instance.
 - `instance_container_child_type`
 - `instance_container_last_modified_by`
 - `instance_container_created_by`
+- `instance_top_container_ref`
 - `instance_top_container_uri`
 - `instance_top_container_long_display_string`
 - `instance_top_container_last_modified_by`
@@ -222,19 +223,25 @@ and the values of each may differ from instance to instance.
 - `instance_top_container_restricted`
 - `instance_top_container_created_by`
 - `instance_top_container_indicator`
+- `instance_top_container_barcode`
 - `instance_top_container_type`
+- `instance_top_container_collection_identifier` (semi-colon (`;`) separated string list)
+- `instance_top_container_collection_display_string` (semi-colon (`;`) separated string list)
+- `instance_top_container_series_identifer` (semi-colon (`;`) separated string list)
+- `instance_top_container_series_display_string` (semi-colon (`;`) separated string list)
 
 ### Archival Object Fields
 
-The following fields are specific to requests made for Archival Object 
-records. 
+In addition to the fields specified above, the following additional fields are 
+specific to requests made for Archival Object records. 
 
 - `repository_processing_note`
 - `component_id`
 
 ### Accession Fields
 
-The following fields are specific to requests made for Accession records. 
+In addition to the fields specified above, the following additional fields are 
+specific to requests made for Accession records. 
 
 - `use_restrictions_note`
 - `access_restrictions_note`
@@ -264,8 +271,8 @@ page of our documentation at https://prometheus.atlas-sys.com.
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemDate', '<#creation_date>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemTitle', '<#title>', 'NULL');
-INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemNumber', '<#barcode_1-container>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'Location', '<#instance_top_container_long_display_string>', 'NULL');
+INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemNumber', '<#instance_top_container_barcode>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemISxN', '<#physical_location_note>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemCallNumber', '<#physical_location_note>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'CallNumber', '<#physical_location_note>|<#collection_id>', 'NULL');

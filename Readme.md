@@ -61,7 +61,7 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     - Removed explicit references to aeon.dll from the ruby partial
     - This change was made to support Aeon installations that don't specify an explicit
     `aeon.dll` in the `:aeon_web_url`
-    - If updating to or past this version, you may need to `aeon.dll` to your settings 
+    - If updating to or past this version, you may need to add `aeon.dll` to your settings 
     for `:aeon_web_url`
     
 

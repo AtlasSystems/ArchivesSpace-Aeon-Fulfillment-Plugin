@@ -15,7 +15,7 @@ mapper = case record
 %>
 
 <% if mapper.show_action? %>
-  <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}aeon.dll?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
+  <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?action=11&type=200", :id => 'aeon_request_sub' do |f| %>
     <% mapper.map.each do |name, value| %>
       <% if name.casecmp('requests').zero? %>
         <% value.each do |request| %>

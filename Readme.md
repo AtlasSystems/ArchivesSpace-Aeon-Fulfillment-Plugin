@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180125
+**Version:** 20180222
 
-**Last Updated:** January 25, 2018
+**Last Updated:** February 22, 2018
 
 
 ## Table of Contents
@@ -38,7 +38,7 @@ options for the built in PUI requesting functionality, it is also possible to
 configure some repositories to continue using the built in PUI requesting 
 feature for archival objects while allowing other repositories to use Aeon. 
 
-This plugin has been tested on version 2.2.0 of ArchivesSpace. Future releases 
+This plugin has been tested on ArchivesSpace version 2.2.0. Future releases 
 of ArchivesSpace may cause changes in the functionality of this plugin. 
 
 
@@ -89,7 +89,7 @@ For example, to configure the plugin for a repository that has the short name
 AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {}
 AppConfig[:aeon_fulfillment]['atlas'] = {}
-AppConfig[:aeon_fulfillment]['atlas'][:aeon_web_url] = "https://your.institution.edu/aeon/"
+AppConfig[:aeon_fulfillment]['atlas'][:aeon_web_url] = "https://your.institution.edu/aeon/aeon.dll"
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace"
 ```
 
@@ -100,11 +100,11 @@ Ruby hash.
 AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {
     "atlas" => {
-        :aeon_web_url => "https://your.institution.edu/aeon/",
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
         :aeon_external_system_id => "ArchivesSpace"
     },
     "test-repo" => {
-        :aeon_web_url => "https://your.institution.edu/aeon/",
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
         :aeon_external_system_id => "ArchivesSpace Test Tepo"
     }
 }
@@ -136,13 +136,13 @@ AppConfig[:plugins] << "aeon_fulfillment"
 
 AppConfig[:aeon_fulfillment] = {
     "special research collections" => {
-        :aeon_web_url => "https://your.institution.edu/aeon/",        
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",        
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace",
         :requests_permitted_for_containers_only => true
     },
     "test special collections" => {
-        :aeon_web_url => "https://your.institution.edu/aeon/",
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace Test",
         :requests_permitted_for_containers_only => false        
@@ -154,7 +154,7 @@ AppConfig[:aeon_fulfillment] = {
 ## Imported Fields
 
 This plugin builds a form that is sent to Aeon through the external requests 
-(`aeon.dll?action=11&type=200`) endpoint of your Aeon installation. Below are 
+(`?action=11&type=200`) endpoint of the Aeon Web interface. Below are 
 the names of the fields as they will appear in the request. 
 
 ### Common Fields
@@ -264,8 +264,9 @@ Each value in the `OpenURLFieldValues` should contain a `<#replacement-tag>`
 that has a name that matches one of the field names from the [Imported Fields](#imported-fields) 
 section. 
 
-For more information on configuring Aeon for this system, please visit the [Submitting Requests via OpenURL](https://prometheus.atlas-sys.com/display/aeon/Submitting+Requests+via+OpenURL) 
-page of our documentation at https://prometheus.atlas-sys.com. 
+For more information on configuring Aeon for this system, please visit the 
+[Submitting Requests via OpenURL](https://prometheus.atlas-sys.com/display/aeon/Submitting+Requests+via+OpenURL)
+page of our documentation at https://prometheus.atlas-sys.com.
 
 ```sql
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');

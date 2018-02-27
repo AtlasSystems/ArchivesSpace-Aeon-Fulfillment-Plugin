@@ -57,6 +57,13 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     - Moved core functionality out of the `.erb`
     - Added support for sending requests for Accessions to Aeon
     - Bug fixes
+- **20180222**
+    - Removed explicit references to aeon.dll from the ruby partial
+    - This change was made to support Aeon installations that don't specify an explicit
+    `aeon.dll` in the `:aeon_web_url`
+    - If updating to or past this version, you may need to `aeon.dll` to your settings 
+    for `:aeon_web_url`
+    
 
 
 ## Configuring Plugin Settings

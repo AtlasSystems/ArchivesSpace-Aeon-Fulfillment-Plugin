@@ -277,7 +277,7 @@ class RecordMapper
                     end
                 end
 
-                return request
+                request
             }
 
         return mappings

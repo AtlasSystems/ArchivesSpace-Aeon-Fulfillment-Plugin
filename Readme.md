@@ -136,6 +136,17 @@ AppConfig[:aeon_fulfillment] = {
   OpenURLMapping table. Each repository configuration can have their own 
   System ID or they can have a duplicate System ID. 
 
+- **:request\_in\_new\_tab**. This setting allows the Aeon request to appear
+  in a different tab, when set to `true`. Defaults to `false`.
+
+- **:hide\_request\_button**. This setting allows the request button to be
+  hidden for the repository, when set to `true`. The button is hidden
+  completely rather than shown disabled. Defaults to `false`.
+
+- **:hide\_button\_for\_accessions**. This setting allows the request
+  button to be hidden for accessions, when set to `true`. Defaults to
+  `false`.
+
 ### Example Configuration
 
 ```ruby

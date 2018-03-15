@@ -26,7 +26,7 @@ mapper = case record
           <% end %>
         <% end %>
       <% else %>
-        <input type='hidden' name='<%= name %>' value='<%= value %>' />
+        <input type='hidden' name='<%= name %>' value='<%= name == 'title' ? strip_mixed_content(value) : value %>' />
       <% end %>
     <% end %>
 

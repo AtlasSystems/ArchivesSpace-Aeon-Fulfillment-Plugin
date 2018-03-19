@@ -16,32 +16,32 @@ mapper = case record
 
 <% unless mapper.hide_button? %>
 
-<% if mapper.show_action? %>
-  <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?action=11&type=200", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
-    <% mapper.map.each do |name, value| %>
-      <% if name.casecmp('requests').zero? %>
-        <% value.each do |request| %>
-          <% request.each do |request_param, request_value| %>
-            <input type='hidden' name='<%= request_param %>' value='<%= request_value %>' />
+  <% if mapper.show_action? %>
+    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?action=11&type=200", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
+      <% mapper.map.each do |name, value| %>
+        <% if name.casecmp('requests').zero? %>
+          <% value.each do |request| %>
+            <% request.each do |request_param, request_value| %>
+              <input type='hidden' name='<%= request_param %>' value='<%= request_value %>' />
+            <% end %>
           <% end %>
+        <% else %>
+          <input type='hidden' name='<%= name %>' value='<%= value %>' />
         <% end %>
-      <% else %>
-        <input type='hidden' name='<%= name %>' value='<%= value %>' />
       <% end %>
+
+      <button type="submit" class="btn page_action request btn-default" title="<%= t('plugins.aeon_fulfillment.request_button_label') %>">
+        <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
+      </button>
     <% end %>
 
-    <button type="submit" class="btn page_action request btn-default" title="<%= t('plugins.aeon_fulfillment.request_button_label') %>">
+  <% else %>
+
+    <button class="btn btn-default page_action request" disabled="true">
       <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
     </button>
+
   <% end %>
-
-<% else %>
-
-  <button class="btn btn-default page_action request" disabled="true">
-    <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
-  </button>
-
-<% end %>
 
 <% end %>
 

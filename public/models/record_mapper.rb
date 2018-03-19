@@ -16,10 +16,8 @@ class RecordMapper
         AppConfig[:aeon_fulfillment][self.repo_code]
     end
 
-    # If #show_action? returns false, then the button is shown disabled
-    # This method tests whether the button should be hidden (rather than just disabled)
-    # This is controlled by two repo config options, which default to false to maintain
-    # the existing functionality.
+    # This method tests whether the button should be hidden. This determination is based
+    # on the settings for the repository and defaults to false.
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
@@ -30,6 +28,7 @@ class RecordMapper
         false
     end
 
+    # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
             puts "Aeon Fulfillment Plugin -- Checking for plugin settings for the repository"

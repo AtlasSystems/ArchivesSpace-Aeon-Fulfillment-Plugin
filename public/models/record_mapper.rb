@@ -1,5 +1,7 @@
 class RecordMapper
 
+    include ManipulateNode
+
     attr_reader :record
 
     def initialize(record)
@@ -14,6 +16,19 @@ class RecordMapper
         AppConfig[:aeon_fulfillment][self.repo_code]
     end
 
+    # This method tests whether the button should be hidden. This determination is based
+    # on the settings for the repository and defaults to false.
+    def hide_button?
+        # returning false to maintain the original behavior
+        return false unless self.repo_settings
+
+        return true if self.repo_settings.fetch(:hide_request_button, false)
+        return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
+
+        false
+    end
+
+    # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
             puts "Aeon Fulfillment Plugin -- Checking for plugin settings for the repository"
@@ -111,7 +126,7 @@ class RecordMapper
         mappings['identifier'] = self.record.identifier || self.record['identifier']
         mappings['publish'] = self.record['publish']
         mappings['level'] = self.record.level || self.record['level']
-        mappings['title'] = self.record['title']
+        mappings['title'] = strip_mixed_content(self.record['title'])
         mappings['uri'] = self.record.uri || self.record['uri']
 
         resolved_resource = self.record['_resolved_resource'] || self.record.resolved_resource
@@ -263,7 +278,7 @@ class RecordMapper
                     end
                 end
 
-                return request
+                request
             }
 
         return mappings

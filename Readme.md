@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180222
+**Version:** 20180319
 
-**Last Updated:** February 22, 2018
+**Last Updated:** March 19, 2018
 
 
 ## Table of Contents
@@ -63,7 +63,12 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     `aeon.dll` in the `:aeon_web_url`
     - If updating to or past this version, you may need to add `aeon.dll` to your settings 
     for `:aeon_web_url`
-    
+- **20180319**
+    - Added the `:request\_in\_new\_tab`, `:hide\_request\_button`, and `:hide\_button\_for\_accessions` 
+    settings. All are optional and default to false.
+    - Fixed a bug where only the first container would be included in the request.
+    - Markup is now stripped from the `title` parameter.
+    - Plugin has been refactored so builtin ArchivesSpace functionality can be used.
 
 
 ## Configuring Plugin Settings
@@ -129,7 +134,7 @@ AppConfig[:aeon_fulfillment] = {
 
 - **:requests\_permitted\_for\_containers\_only**. This settings specifies 
   whether requests are limited to resources with top containers only. The 
-  default for this setting is false. 
+  default for this setting is `false`. 
 
 - **:aeon\_external\_system\_id**. This setting specifies the System ID, which 
   is used by Aeon to determine which mapping rules to use from its 

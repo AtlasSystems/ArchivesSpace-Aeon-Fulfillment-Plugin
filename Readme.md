@@ -64,7 +64,7 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     - If updating to or past this version, you may need to add `aeon.dll` to your settings 
     for `:aeon_web_url`
 - **20180319**
-    - Added the `:request\_in\_new\_tab`, `:hide\_request\_button`, and `:hide\_button\_for\_accessions` 
+    - Added the `:request_in_new_tab`, `:hide_request_button`, and `:hide_button_for_accessions` 
     settings. All are optional and default to false.
     - Fixed a bug where only the first container would be included in the request.
     - Markup is now stripped from the `title` parameter.

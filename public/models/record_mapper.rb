@@ -1,5 +1,7 @@
 class RecordMapper
 
+    include ManipulateNode
+
     attr_reader :record
 
     def initialize(record)
@@ -125,7 +127,7 @@ class RecordMapper
         mappings['identifier'] = self.record.identifier || self.record['identifier']
         mappings['publish'] = self.record['publish']
         mappings['level'] = self.record.level || self.record['level']
-        mappings['title'] = self.record['title']
+        mappings['title'] = strip_mixed_content(self.record['title'])
         mappings['uri'] = self.record.uri || self.record['uri']
 
         resolved_resource = self.record['_resolved_resource'] || self.record.resolved_resource

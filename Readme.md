@@ -326,3 +326,27 @@ INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLF
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemCallNumber', '<#physical_location_note>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'CallNumber', '<#physical_location_note>|<#collection_id>', 'NULL');
 ```
+
+## Custom Mappers
+
+The plugin provides default mappers for Accession and ArchivalObject records.
+
+It is possible to override the default mappers by providing a custom mapping class and pointing
+to it in configuration, like this:
+
+```ruby
+AppConfig[:aeon_fulfillment_mappers] = {
+  'Accession' => 'MyAeonAccessionMapper'
+}
+```
+
+Where the keys in the hash are `Accession` and/or `ArchivalObject` (ie the names of the model
+classes supported by the plugin), and the values are the names of the custom mapping classes
+provided.
+
+The custom mapping class should inherit from one of the provided mapping classes and then
+implement whatever custom mappings are required by overriding the relevant methods. (See
+the default mappers for examples, as they override behavior from the base AeonRecordMapper class)
+
+The custom mapping class can be loaded from another plugin provided it is listed after this
+plugin in the array of plugins in the configuration.

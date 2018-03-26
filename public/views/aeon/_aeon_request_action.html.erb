@@ -1,17 +1,7 @@
 <%
 puts "Aeon Fulfillment Plugin -- Initializing Plugin..."
 
-mapper = case record
-  when ArchivalObject
-    ArchivalObjectMapper.new(record)
-  when Accession
-    AccessionMapper.new(record)
-  else
-    message = "Aeon Fulfillment Plugin -- This ArchivesSpace object type is not supported by this plugin."
-    puts record.inspect
-    puts message
-    raise message
-  end
+mapper = AeonRecordMapper.mapper_for(record)
 %>
 
 <% unless mapper.hide_button? %>

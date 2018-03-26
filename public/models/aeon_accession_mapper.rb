@@ -1,4 +1,4 @@
-class AccessionMapper < RecordMapper
+class AeonAccessionMapper < AeonRecordMapper
 
     def initialize(accession)
         super(accession)

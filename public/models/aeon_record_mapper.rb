@@ -222,7 +222,7 @@ class AeonRecordMapper
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
-        instances = json.fetch('instances')
+        instances = json.fetch('instances', false)
         if !instances
             return mappings
         end

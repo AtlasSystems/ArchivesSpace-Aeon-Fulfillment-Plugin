@@ -1,5 +1,7 @@
 class AeonArchivalObjectMapper < AeonRecordMapper
 
+    register_for_record_type(ArchivalObject)
+
     def initialize(archival_object)
         super(archival_object)
     end

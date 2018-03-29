@@ -2,26 +2,21 @@ class AeonRecordMapper
 
     include ManipulateNode
 
+    @@mappers = {}
+
     attr_reader :record
 
     def initialize(record)
         @record = record
     end
 
-    def self.mapper_for(record)
-      unless defined? @@mappers
-        # initialize with the default mappers
-        @@mappers = {
-          'Accession' => 'AeonAccessionMapper', 
-          'ArchivalObject' => 'AeonArchivalObjectMapper' 
-        }
-        if AppConfig.has_key?(:aeon_fulfillment_mappers)
-          @@mappers.merge!(AppConfig[:aeon_fulfillment_mappers])
-        end
-      end
+    def self.register_for_record_type(type)
+      @@mappers[type] = self
+    end
 
-      if @@mappers.has_key?(record.class.to_s)
-        Kernel.const_get(@@mappers[record.class.to_s]).new(record)
+    def self.mapper_for(record)
+      if @@mappers.has_key?(record.class)
+        @@mappers[record.class].new(record)
       else
         Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
         raise

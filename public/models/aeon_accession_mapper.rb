@@ -1,5 +1,7 @@
 class AeonAccessionMapper < AeonRecordMapper
 
+    register_for_record_type(Accession)
+
     def initialize(accession)
         super(accession)
     end

@@ -304,7 +304,13 @@ INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLF
 
 ## Custom Mappers
 
-The plugin provides default mappers for Accession and ArchivalObject records.
+The plugin provides default mappers for Accession and ArchivalObject records. To
+support other record types, specify the list of supported record type in
+configuration like this:
+
+```ruby
+  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'other_record_type']
+```
 
 It is possible to override the default mappers by providing a custom mapper class.
 Mapper classes register to handle record types by calling the class method

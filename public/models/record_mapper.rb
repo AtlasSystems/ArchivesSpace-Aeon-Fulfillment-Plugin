@@ -39,7 +39,7 @@ class RecordMapper
                 puts "Aeon Fulfillment Plugin -- Checking for top containers"
                 has_top_container = false
 
-                instances = self.record.dig('json', 'instances')
+                instances = self.record.json['instances']
                 if instances
                     instances.each do |instance|
 

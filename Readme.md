@@ -70,7 +70,7 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     - Markup is now stripped from the `title` parameter.
     - Plugin has been refactored so builtin ArchivesSpace functionality can be used.
 - **20180410**
-    - Fixes a bug with the `:requests_permitted_for_containers_only` setting
+    - Fixed a bug with the `:requests_permitted_for_containers_only` setting
 
 ## Configuring Plugin Settings
 

@@ -173,6 +173,14 @@ AppConfig[:aeon_fulfillment] = {
   this setting is not specified in the settings for the repository, no Aeon
   site code will be sent.
 
+- **:hide\_button\_for\_access\_restriction\_types**. This setting allows
+  the request button to be hidden for any records that have any of the
+  listed local access restriction types. The value of this config item
+  should be an array of restriction types, for example:
+      `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
+  By default no restriction types are hidden.
+
+
 ### Example Configuration
 
 ```ruby

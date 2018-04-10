@@ -139,6 +139,8 @@ class AeonRecordMapper
                 "ArchivesSpace"
             end
 
+        mappings['Site'] = self.repo_settings[:site] if self.repo_settings.has_key?(:site)
+
         return mappings
     end
 

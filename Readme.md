@@ -180,6 +180,8 @@ AppConfig[:aeon_fulfillment] = {
       `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
   By default no restriction types are hidden.
 
+- **:site**. This setting specifies the site code for a repository.
+
 
 ### Example Configuration
 

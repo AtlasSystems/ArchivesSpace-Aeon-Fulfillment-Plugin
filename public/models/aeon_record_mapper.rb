@@ -143,6 +143,8 @@ class AeonRecordMapper
             mappings['aeon_site_code'] = self.repo_settings[:aeon_site_code]
         end
 
+        mappings['Site'] = self.repo_settings[:site] if self.repo_settings.has_key?(:site)
+
         return mappings
     end
 

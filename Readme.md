@@ -152,6 +152,16 @@ AppConfig[:aeon_fulfillment] = {
   button to be hidden for accessions, when set to `true`. Defaults to
   `false`.
 
+- **:hide\_button\_for\_access\_restriction\_types**. This setting allows
+  the request button to be hidden for any records that have any of the
+  listed local access restriction types. The value of this config item
+  should be an array of restriction types, for example:
+      `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
+  By default no restriction types are hidden.
+
+- **:site**. This setting specifies the site code for a repository.
+
+
 ### Example Configuration
 
 ```ruby
@@ -301,3 +311,28 @@ INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLF
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemCallNumber', '<#physical_location_note>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'CallNumber', '<#physical_location_note>|<#collection_id>', 'NULL');
 ```
+
+## Custom Mappers
+
+The plugin provides default mappers for Accession and ArchivalObject records. To
+support other record types, specify the list of supported record type in
+configuration like this:
+
+```ruby
+  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'other_record_type']
+```
+
+It is possible to override the default mappers by providing a custom mapper class.
+Mapper classes register to handle record types by calling the class method
+#register_for_record_type(type), like this:
+
+```ruby
+  register_for_record_type(Accession)
+```
+
+The custom mapping class should inherit from one of the provided mapper classes and then
+implement whatever custom mappings are required by overriding the relevant methods. (See
+the default mappers for examples, as they override behavior from the base AeonRecordMapper class)
+
+The custom mapping class can be loaded from another plugin provided it is listed after this
+plugin in the array of plugins in the configuration.

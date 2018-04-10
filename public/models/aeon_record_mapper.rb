@@ -1,11 +1,26 @@
-class RecordMapper
+class AeonRecordMapper
 
     include ManipulateNode
+
+    @@mappers = {}
 
     attr_reader :record
 
     def initialize(record)
         @record = record
+    end
+
+    def self.register_for_record_type(type)
+      @@mappers[type] = self
+    end
+
+    def self.mapper_for(record)
+      if @@mappers.has_key?(record.class)
+        @@mappers[record.class].new(record)
+      else
+        Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
+        raise
+      end
     end
 
     def repo_code
@@ -24,6 +39,15 @@ class RecordMapper
 
         return true if self.repo_settings.fetch(:hide_request_button, false)
         return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
+
+        if (types = self.repo_settings.fetch(:hide_button_for_access_restriction_types, false))
+          notes = record.json['notes'].select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
+                                      .map {|n| n['rights_restriction']['local_access_restriction_type']}
+                                      .flatten.uniq
+
+          # hide if the record notes have any of the restriction types listed in config
+          return true if (notes - types).length < notes.length
+        end
 
         false
     end
@@ -115,6 +139,8 @@ class RecordMapper
                 "ArchivesSpace"
             end
 
+        mappings['Site'] = self.repo_settings[:site] if self.repo_settings.has_key?(:site)
+
         return mappings
     end
 
@@ -202,7 +228,7 @@ class RecordMapper
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
-        instances = json.fetch('instances')
+        instances = json.fetch('instances', false)
         if !instances
             return mappings
         end

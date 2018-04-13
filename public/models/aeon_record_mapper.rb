@@ -41,9 +41,9 @@ class AeonRecordMapper
         return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
 
         if (types = self.repo_settings.fetch(:hide_button_for_access_restriction_types, false))
-          notes = record.json['notes'].select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
-                                      .map {|n| n['rights_restriction']['local_access_restriction_type']}
-                                      .flatten.uniq
+          notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
+                                              .map {|n| n['rights_restriction']['local_access_restriction_type']}
+                                              .flatten.uniq
 
           # hide if the record notes have any of the restriction types listed in config
           return true if (notes - types).length < notes.length

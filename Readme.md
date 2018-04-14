@@ -136,7 +136,7 @@ AppConfig[:aeon_fulfillment] = {
 }
 ```
 
-### All Aeon Fulfillment Plugin Configuration Options
+### All Aeon Fulfillment Plugin Per Repository Configuration Options
 
 - **:aeon\_web\_url**. (Required). This setting specifies the web url that 
   points to an Aeon installation. The plugin will send requests to this url, 
@@ -181,6 +181,22 @@ AppConfig[:aeon_fulfillment] = {
   By default no restriction types are hidden.
 
 - **:site**. This setting specifies the site code for a repository.
+
+
+### Other Configuration Options
+
+The following configuration options apply globally, rather than for a particular
+repository.
+
+- **:aeon\_fulfillment\_record\_types**. This setting takes an array of record
+  types. It allows this plugin to handle additional record types via custom mappers
+  - see below.
+
+- **:aeon\_fulfillment\_button\_position**. This setting supports the positioning
+  of the request button relative to the other buttons appearing on a page. By default
+  the button will appear to the right of all built in buttons and to the left of any
+  plugin buttons loaded after it. Setting this to `0` will cause the request button
+  to appear to the left of the built in buttons.
 
 
 ### Example Configuration

@@ -189,8 +189,8 @@ The following configuration options apply globally, rather than for a particular
 repository.
 
 - **:aeon\_fulfillment\_record\_types**. This setting takes an array of record
-  types. It allows this plugin to handle additional record types via custom mappers
-  - see below.
+  types. It allows this plugin to handle additional record types via custom
+  mappers - see below.
 
 - **:aeon\_fulfillment\_button\_position**. This setting supports the positioning
   of the request button relative to the other buttons appearing on a page. By default

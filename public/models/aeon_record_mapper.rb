@@ -80,6 +80,10 @@ class AeonRecordMapper
 
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
 
+                # if we're showing the button for accessions, and this is an accession,
+                # then don't require containers
+                only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
+
                 puts "Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}"
                 puts "Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}"
 

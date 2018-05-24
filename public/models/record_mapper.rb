@@ -115,6 +115,10 @@ class RecordMapper
                 "ArchivesSpace"
             end
 
+        if (!self.repo_settings[:aeon_site_code].blank?)
+            mappings['aeon_site_code'] = self.repo_settings[:aeon_site_code]
+        end
+
         return mappings
     end
 

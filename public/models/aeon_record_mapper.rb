@@ -78,6 +78,8 @@ class AeonRecordMapper
                     end
                 end
 
+                has_top_container = true if record.is_a?(Container)
+
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
 
                 # if we're showing the button for accessions, and this is an accession,

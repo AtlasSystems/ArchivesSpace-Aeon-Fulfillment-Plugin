@@ -69,8 +69,11 @@ of ArchivesSpace may cause changes in the functionality of this plugin.
     - Fixed a bug where only the first container would be included in the request.
     - Markup is now stripped from the `title` parameter.
     - Plugin has been refactored so builtin ArchivesSpace functionality can be used.
-- **20180410**
+- **20180524**
     - Fixed a bug with the `:requests_permitted_for_containers_only` setting
+    - Added a locale to the en.yml that allows sites to configure the icon on
+      the Aeon request button without editing the `.html.erb` file directly.
+      Please check https://fontawesome.com/ for the list of available icons.
 
 ## Configuring Plugin Settings
 

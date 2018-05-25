@@ -78,6 +78,9 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added an `:aeon_site_code` setting, allowing sites to specify the Aeon
       site code that should be put into the Site field of the Aeon Transaction
       record.
+    - Added a locale to the en.yml that allows sites to configure the icon on
+      the Aeon request button without editing the `.html.erb` file directly.
+      Please check https://fontawesome.com/ for the list of available icons.
 
 
 ## Configuring Plugin Settings

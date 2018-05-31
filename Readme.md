@@ -166,12 +166,9 @@ AppConfig[:aeon_fulfillment] = {
   button to be hidden for accessions, when set to `true`. Defaults to
   `false`.
 
-- **:aeon\_site\_code**. This setting specifies the string that is sent with
-  the request in a field labeled `aeon_site_code`. This setting will not
-  automatically set the `Site` field on the Aeon Transaction record. The site
-  field has to be manually configured through the `OpenURLMapping` table. If 
-  this setting is not specified in the settings for the repository, no Aeon
-  site code will be sent.
+- **:aeon\_site\_code**. This setting specifies the Aeon site code for a
+  repository. If this setting is not specified in the settings for the
+  repository, no Aeon site code will be sent.
 
 - **:hide\_button\_for\_access\_restriction\_types**. This setting allows
   the request button to be hidden for any records that have any of the
@@ -179,8 +176,6 @@ AppConfig[:aeon_fulfillment] = {
   should be an array of restriction types, for example:
       `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
   By default no restriction types are hidden.
-
-- **:site**. This setting specifies the site code for a repository.
 
 
 ### Other Configuration Options
@@ -342,7 +337,6 @@ For more information on configuring Aeon for this system, please visit the
 page of our documentation at https://prometheus.atlas-sys.com.
 
 ```sql
-INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'Site', '<#aeon_site_code>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemDate', '<#creation_date>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemTitle', '<#title>', 'NULL');

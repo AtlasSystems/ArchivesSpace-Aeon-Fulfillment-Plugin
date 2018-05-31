@@ -15,6 +15,7 @@
         1. [Per Repository Configuration Options](#per-repository-configuration-options)
         2. [Other Configuration Options](#other-configuration-options)
         3. [Example Configuration](#example-configuration)
+        4. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
     5. [Imported Fields](#imported-fields)
         1. [Common Fields](#common-fields)
         2. [Archival Object Fields](#archival-object-fields)
@@ -246,7 +247,7 @@ AppConfig[:aeon_fulfillment] = {
     }
 }
 ```
-## Special Note for Aeon Remote Authentication configurations
+## Aeon Remote Authentication Configurations
 This plugin is designed to send as much data from ArchivesSpace as possible to 
 allow users to easily map fields on the Aeon side of the integration. As such, it uses POST 
 data rather than GET parameters so that data does not get truncated. This can be problematic 

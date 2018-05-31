@@ -12,13 +12,15 @@
     2. [Overview](#overview)
     3. [Changelog](#changelog)
     4. [Configuring Plugin Settings](#configuring-plugin-settings)
-        1. [All Aeon Fulfillment Plugin Configuration Options](#all-aeon-fulfillment-plugin-configuration-options)
-        2. [Example Configuration](#example-configuration)
+        1. [Per Repository Configuration Options](#per-repository-configuration-options)
+        2. [Other Configuration Options](#other-configuration-options)
+        3. [Example Configuration](#example-configuration)
     5. [Imported Fields](#imported-fields)
         1. [Common Fields](#common-fields)
         2. [Archival Object Fields](#archival-object-fields)
         3. [Accession Fields](#accession-fields)
     6. [OpenURL Mappings](#openurl-mappings)
+    7. [Custom Mappers](#custom-mappers)
 
 
 ## Overview
@@ -81,6 +83,32 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added a locale to the en.yml that allows sites to configure the icon on
       the Aeon request button without editing the `.html.erb` file directly.
       Please check https://fontawesome.com/ for the list of available icons.
+- **20180531**
+    - Additions
+        - Added support for custom record mappers.
+        - Added support for specifying record types to be specified from the
+          config.
+        - Added support for hiding the button for records that have listed
+          access restriction types.
+        - Added support for positioning the Aeon request button relative to
+          the other page actions.
+    - Improvements
+        - Renamed the mappers to include Aeon in the name for a bit of name
+          safety.
+        - Replaced the switch in the erb that finds the appropriate mapper for
+          a record with a call to a class method `#mapper_for(record)` on the
+          base record mapper class.
+        - Changed the operation of the `aeon_site_code` mapping. No longer
+          need to specify a mapping for the Aeon site code in the
+          OpenURLMapping table. The Aeon DLL will automatically route the
+          provided Site code directly into the Transaction record.
+        - Now uses a method provided by ArchivesSpace to add the Aeon request
+          button.
+        - Now shows the button enabled for Accessions even if they don't have
+          containers, in cases where requests are only permitted for
+          containers as well as Accessions.
+        - Improvements to checking to see if the current record is/has a
+          container.
 
 
 ## Configuring Plugin Settings
@@ -136,7 +164,7 @@ AppConfig[:aeon_fulfillment] = {
 }
 ```
 
-### All Aeon Fulfillment Plugin Per Repository Configuration Options
+### Per Repository Configuration Options
 
 - **:aeon\_web\_url**. (Required). This setting specifies the web url that 
   points to an Aeon installation. The plugin will send requests to this url, 
@@ -170,12 +198,14 @@ AppConfig[:aeon_fulfillment] = {
   repository. If this setting is not specified in the settings for the
   repository, no Aeon site code will be sent.
 
-- **:hide\_button\_for\_access\_restriction\_types**. This setting allows
-  the request button to be hidden for any records that have any of the
-  listed local access restriction types. The value of this config item
-  should be an array of restriction types, for example:
-      `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
-  By default no restriction types are hidden.
+- **:hide\_button\_for\_access\_restriction\_types**. This setting allows the
+  request button to be hidden for any records that have any of the listed
+  local access restriction types. The value of this config item should be an
+  array of restriction types, for example:
+  
+  `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']` 
+  
+  By default, no restriction types are hidden.
 
 
 ### Other Configuration Options
@@ -184,8 +214,8 @@ The following configuration options apply globally, rather than for a particular
 repository.
 
 - **:aeon\_fulfillment\_record\_types**. This setting takes an array of record
-  types. It allows this plugin to handle additional record types via custom
-  mappers - see below.
+  types. It allows this plugin to handle additional record types via [custom
+  mappers (see below)](#custom-mappers).
 
 - **:aeon\_fulfillment\_button\_position**. This setting supports the positioning
   of the request button relative to the other buttons appearing on a page. By default
@@ -232,7 +262,7 @@ records.
 - `SystemID`
 - `ReturnLinkURL`
 - `ReturnLinkSystemName`
-- `aeon_site_code`
+- `Site`
 - `identifier`
 - `publish` (true/false value)
 - `level`
@@ -322,15 +352,15 @@ specific to requests made for Accession records.
 
 Below is a list of recommended Open URL mappings that should be set in Aeon.
 
-The `rfr_id` column should exactly match the configured 
-`:aeon_external_system_id` for each repository. Multiple repositories can have 
-the same or different System IDs. 
+1. The `rfr_id` column should exactly match the configured
+   `:aeon_external_system_id` for each repository. Multiple repositories can
+   have the same or different System IDs.
 
-The `AeonFieldName` column should exactly match an Aeon field name. 
+2. The `AeonFieldName` column should exactly match an Aeon field name.
 
-Each value in the `OpenURLFieldValues` should contain a `<#replacement-tag>` 
-that has a name that matches one of the field names from the [Imported Fields](#imported-fields) 
-section. 
+3. Each value in the `OpenURLFieldValues` should contain a
+   `<#replacement-tag>` that has a name that matches one of the field names
+   from the [Imported Fields](#imported-fields) section.
 
 For more information on configuring Aeon for this system, please visit the 
 [Submitting Requests via OpenURL](https://prometheus.atlas-sys.com/display/aeon/Submitting+Requests+via+OpenURL)

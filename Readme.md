@@ -168,8 +168,9 @@ AppConfig[:aeon_fulfillment] = {
 
 - **:aeon\_web\_url**. (Required). This setting specifies the web url that 
   points to an Aeon installation. The plugin will send requests to this url, 
-  after adding the external requests endpoint (`aeon.dll?action=11&type=200`) 
-  to the end. 
+  after adding the external requests endpoint (`?action=11&type=200`) 
+  to the end. If you are using the Atlas Dual Auth Portal, this setting should
+  point to that URL instead (https://institution.dualauthurl.edu/login/").
 
 - **:aeon\_return\_link\_label**. (Required). This setting specifies the text 
   that will display on the button that takes users back to ArchivesSpace. 
@@ -223,7 +224,6 @@ repository.
   plugin buttons loaded after it. Setting this to `0` will cause the request button
   to appear to the left of the built in buttons.
 
-
 ### Example Configuration
 
 ```ruby
@@ -246,7 +246,16 @@ AppConfig[:aeon_fulfillment] = {
     }
 }
 ```
-
+## Special Note for Aeon Remote Authentication configurations
+This plugin is designed to send as much data from ArchivesSpace as possible to 
+allow users to easily map fields on the Aeon side of the integration. As such, it uses POST 
+data rather than GET parameters so that data does not get truncated. This can be problematic 
+for some remote authentication systems. If you are using the Atlas Dual Auth Portal, it 
+already has functionality to resolve this issue by persisting POST data during the remote 
+authentication process so you can simply configure this plugin to send requests to it 
+instead of directly to Aeon. If you are not using the Atlas Dual Auth Portal with your 
+remote authentication configuration or are having difficulty getting it configured 
+correctly, please contact Atlas Support.
 
 ## Imported Fields
 

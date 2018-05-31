@@ -1,11 +1,13 @@
-class ArchivalObjectMapper < RecordMapper
-    
+class AeonArchivalObjectMapper < AeonRecordMapper
+
+    register_for_record_type(ArchivalObject)
+
     def initialize(archival_object)
         super(archival_object)
     end
 
 
-    # Override for RecordMapper json_fields method. 
+    # Override for AeonRecordMapper json_fields method. 
     def json_fields
         mappings = super
 

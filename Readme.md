@@ -136,7 +136,7 @@ AppConfig[:aeon_fulfillment] = {
 }
 ```
 
-### All Aeon Fulfillment Plugin Configuration Options
+### All Aeon Fulfillment Plugin Per Repository Configuration Options
 
 - **:aeon\_web\_url**. (Required). This setting specifies the web url that 
   points to an Aeon installation. The plugin will send requests to this url, 
@@ -166,12 +166,33 @@ AppConfig[:aeon_fulfillment] = {
   button to be hidden for accessions, when set to `true`. Defaults to
   `false`.
 
-- **:aeon\_site\_code**. This setting specifies the string that is sent with
-  the request in a field labeled `aeon_site_code`. This setting will not
-  automatically set the `Site` field on the Aeon Transaction record. The site
-  field has to be manually configured through the `OpenURLMapping` table. If 
-  this setting is not specified in the settings for the repository, no Aeon
-  site code will be sent.
+- **:aeon\_site\_code**. This setting specifies the Aeon site code for a
+  repository. If this setting is not specified in the settings for the
+  repository, no Aeon site code will be sent.
+
+- **:hide\_button\_for\_access\_restriction\_types**. This setting allows
+  the request button to be hidden for any records that have any of the
+  listed local access restriction types. The value of this config item
+  should be an array of restriction types, for example:
+      `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']`
+  By default no restriction types are hidden.
+
+
+### Other Configuration Options
+
+The following configuration options apply globally, rather than for a particular
+repository.
+
+- **:aeon\_fulfillment\_record\_types**. This setting takes an array of record
+  types. It allows this plugin to handle additional record types via custom
+  mappers - see below.
+
+- **:aeon\_fulfillment\_button\_position**. This setting supports the positioning
+  of the request button relative to the other buttons appearing on a page. By default
+  the button will appear to the right of all built in buttons and to the left of any
+  plugin buttons loaded after it. Setting this to `0` will cause the request button
+  to appear to the left of the built in buttons.
+
 
 ### Example Configuration
 
@@ -316,7 +337,6 @@ For more information on configuring Aeon for this system, please visit the
 page of our documentation at https://prometheus.atlas-sys.com.
 
 ```sql
-INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'Site', '<#aeon_site_code>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemDate', '<#creation_date>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemTitle', '<#title>', 'NULL');
@@ -326,3 +346,28 @@ INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLF
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemCallNumber', '<#physical_location_note>', 'NULL');
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'CallNumber', '<#physical_location_note>|<#collection_id>', 'NULL');
 ```
+
+## Custom Mappers
+
+The plugin provides default mappers for Accession and ArchivalObject records. To
+support other record types, specify the list of supported record type in
+configuration like this:
+
+```ruby
+  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'other_record_type']
+```
+
+It is possible to override the default mappers by providing a custom mapper class.
+Mapper classes register to handle record types by calling the class method
+#register_for_record_type(type), like this:
+
+```ruby
+  register_for_record_type(Accession)
+```
+
+The custom mapping class should inherit from one of the provided mapper classes and then
+implement whatever custom mappings are required by overriding the relevant methods. (See
+the default mappers for examples, as they override behavior from the base AeonRecordMapper class)
+
+The custom mapping class can be loaded from another plugin provided it is listed after this
+plugin in the array of plugins in the configuration.

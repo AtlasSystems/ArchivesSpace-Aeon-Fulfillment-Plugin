@@ -1,11 +1,26 @@
-class RecordMapper
+class AeonRecordMapper
 
     include ManipulateNode
+
+    @@mappers = {}
 
     attr_reader :record
 
     def initialize(record)
         @record = record
+    end
+
+    def self.register_for_record_type(type)
+      @@mappers[type] = self
+    end
+
+    def self.mapper_for(record)
+      if @@mappers.has_key?(record.class)
+        @@mappers[record.class].new(record)
+      else
+        Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
+        raise
+      end
     end
 
     def repo_code
@@ -24,6 +39,15 @@ class RecordMapper
 
         return true if self.repo_settings.fetch(:hide_request_button, false)
         return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
+
+        if (types = self.repo_settings.fetch(:hide_button_for_access_restriction_types, false))
+          notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
+                                              .map {|n| n['rights_restriction']['local_access_restriction_type']}
+                                              .flatten.uniq
+
+          # hide if the record notes have any of the restriction types listed in config
+          return true if (notes - types).length < notes.length
+        end
 
         false
     end
@@ -54,7 +78,13 @@ class RecordMapper
                     end
                 end
 
+                has_top_container = true if record.is_a?(Container)
+
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
+
+                # if we're showing the button for accessions, and this is an accession,
+                # then don't require containers
+                only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
 
                 puts "Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}"
                 puts "Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}"
@@ -115,9 +145,7 @@ class RecordMapper
                 "ArchivesSpace"
             end
 
-        if (!self.repo_settings[:aeon_site_code].blank?)
-            mappings['aeon_site_code'] = self.repo_settings[:aeon_site_code]
-        end
+        mappings['Site'] = self.repo_settings[:aeon_site_code] if self.repo_settings.has_key?(:aeon_site_code)
 
         return mappings
     end
@@ -206,7 +234,7 @@ class RecordMapper
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
-        instances = json.fetch('instances')
+        instances = json.fetch('instances', false)
         if !instances
             return mappings
         end

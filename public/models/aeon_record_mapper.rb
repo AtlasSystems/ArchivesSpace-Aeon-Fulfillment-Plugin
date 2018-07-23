@@ -254,13 +254,13 @@ class AeonRecordMapper
                 request["instance_instance_type_#{instance_count}"] = instance['instance_type']
                 request["instance_created_by_#{instance_count}"] = instance['created_by']
 
-                request["instance_container_grandchild_indicator_#{instance_count}"] = instance['indicator_3']
-                request["instance_container_child_indicator_#{instance_count}"] = instance['indicator_2']
-                request["instance_container_grandchild_type_#{instance_count}"] = instance['type_3']
-                request["instance_container_child_type_#{instance_count}"] = instance['type_2']
-
                 container = instance['sub_container']
                 if container
+                    request["instance_container_grandchild_indicator_#{instance_count}"] = instance['indicator_3']
+                    request["instance_container_child_indicator_#{instance_count}"] = instance['indicator_2']
+                    request["instance_container_grandchild_type_#{instance_count}"] = instance['type_3']
+                    request["instance_container_child_type_#{instance_count}"] = instance['type_2']
+
                     request["instance_container_last_modified_by_#{instance_count}"] = container['last_modified_by']
                     request["instance_container_created_by_#{instance_count}"] = container['created_by']
 

@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180531
+**Version:** 20180726
 
-**Last Updated:** May 31, 2018
+**Last Updated:** July 26, 2018
 
 
 ## Table of Contents
@@ -110,6 +110,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
           containers as well as Accessions.
         - Improvements to checking to see if the current record is/has a
           container.
+- **20180726**
+    - Fixed a bug with imported instance data.
 
 
 ## Configuring Plugin Settings

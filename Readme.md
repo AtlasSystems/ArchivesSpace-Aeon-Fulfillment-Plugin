@@ -177,6 +177,9 @@ AppConfig[:aeon_fulfillment] = {
 
 - **:aeon\_return\_link\_label**. (Required). This setting specifies the text 
   that will display on the button that takes users back to ArchivesSpace. 
+  If `AppConfig[:public_proxy_url]` is set in `config/config.rb`, then the
+  *link* associated with this label will be influenced by that setting. See
+  the `ReturnLinkURL` field below.
 
 - **:requests\_permitted\_for\_containers\_only**. This settings specifies 
   whether requests are limited to resources with top containers only. The 
@@ -273,6 +276,9 @@ records.
 
 - `SystemID`
 - `ReturnLinkURL`
+    - If `AppConfig[:public_proxy_url]` is set in `config/config.rb`, then
+      the prefix (*scheme://host:port*) portion of `ReturnLinkURL` will
+      be replaced by its value.
 - `ReturnLinkSystemName`
 - `Site`
 - `identifier`

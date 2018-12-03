@@ -432,11 +432,12 @@ plugin in the array of plugins in the configuration.
 ## Configuring the Aeon Request Form Used
 
 It is possible to control the Aeon request form that fulfillment requests use by adding an entry to
-the OpenURLMapping table for the `DocumentType` parameter. The new OpenURLMapping entry should will
-resemble something like `(Default, ArchivesSpace, Replace, DocumentType, [SomeDocumentType])`.
+the OpenURLMapping table for the `DocumentType` parameter. The new OpenURLMapping entry should
+resemble `(Default, ArchivesSpace, Replace, DocumentType, [SomeDocumentType])`. For example, using
+"Manuscript" in place of `[SomeDocumentType]` causes requests to use the `GenericRequestManuscript`
+form. 
 
-For example, using "Manuscript" in place of `[SomeDocumentType]` causes requests to use the
-`GenericRequestManuscript` form. There is some complexity to controlling which form is used:
+There is some complexity to controlling which form is used:
 
 1. Aeon Transaction fields will populated if (a) there is an entry in OpenURLMapping for the Aeon Transaction
 field and (b) if the result of evaluating tag strings from the `OpenURLFieldValues` column of the

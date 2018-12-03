@@ -2,7 +2,7 @@
 
 **Version:** 20180726
 
-**Last Updated:** July 26, 2018
+**Last Updated:** December 3, 2018
 
 
 ## Table of Contents
@@ -22,6 +22,7 @@
         3. [Accession Fields](#accession-fields)
     6. [OpenURL Mappings](#openurl-mappings)
     7. [Custom Mappers](#custom-mappers)
+    8. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
 
 
 ## Overview
@@ -252,7 +253,10 @@ AppConfig[:aeon_fulfillment] = {
     }
 }
 ```
+
+
 ## Aeon Remote Authentication Configurations
+
 This plugin is designed to send as much data from ArchivesSpace as possible to 
 allow users to easily map fields on the Aeon side of the integration. As such, it uses POST 
 data rather than GET parameters so that data does not get truncated. This can be problematic 
@@ -262,6 +266,7 @@ authentication process so you can simply configure this plugin to send requests 
 instead of directly to Aeon. If you are not using the Atlas Dual Auth Portal with your 
 remote authentication configuration or are having difficulty getting it configured 
 correctly, please contact Atlas Support.
+
 
 ## Imported Fields
 
@@ -397,6 +402,7 @@ INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLF
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'CallNumber', '<#physical_location_note>|<#collection_id>', 'NULL');
 ```
 
+
 ## Custom Mappers
 
 The plugin provides default mappers for Accession and ArchivalObject records. To
@@ -421,3 +427,29 @@ the default mappers for examples, as they override behavior from the base AeonRe
 
 The custom mapping class can be loaded from another plugin provided it is listed after this
 plugin in the array of plugins in the configuration.
+
+
+## Configuring the Aeon Request Form Used
+
+It is possible to control the Aeon request form that fulfillment requests use by adding an entry to
+the OpenURLMapping table for the `DocumentType` parameter. The new OpenURLMapping entry should will
+resemble something like `(Default, ArchivesSpace, Replace, DocumentType, [SomeDocumentType])`.
+
+For example, using "Manuscript" in place of `[SomeDocumentType]` causes requests to use the
+`GenericRequestManuscript` form. There is some complexity to controlling which form is used:
+
+1. Aeon Transaction fields will populated if (a) there is an entry in OpenURLMapping for the Aeon Transaction
+field and (b) if the result of evaluating tag strings from the `OpenURLFieldValues` column of the
+OpenURLMapping table against the OpenUrl request from ArchivesSpace results in a non-empty value. Aeon
+Transaction fields can also be populated directly, if there is a direct match between one of the parameters
+of the OpenUrl request and a field in the Aeon Transaction table.
+
+2. If DocumentType and RequestType are both not populated, or if their values do not make sense to
+Aeon, then the Aeon Transaction will use the DefaultRequest form.
+
+3. If DocumentType is not populated, or if it's populated as "Default", and RequestType is populated
+as "Copy", then the Aeon Transaction will use the PhotoduplicationRequest form.
+
+4. If DocumentType is not "Default", then the name of the form that the Aeon Transaction will use 
+will be "GenericRequest", concatenated with the value stored in DocumentType parameter on the Aeon
+Transaction.

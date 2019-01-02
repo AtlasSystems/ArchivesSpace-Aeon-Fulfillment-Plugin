@@ -4,6 +4,8 @@ puts "Aeon Fulfillment Plugin -- Initializing Plugin..."
 mapper = AeonRecordMapper.mapper_for(record)
 %>
 
+<%= javascript_include_tag "#{@base_url}/assets/js/aeon_request_action.js" %>
+
 <% unless mapper.hide_button? %>
 
   <% if mapper.show_action? %>
@@ -27,9 +29,12 @@ mapper = AeonRecordMapper.mapper_for(record)
 
   <% else %>
 
-    <button class="btn btn-default page_action request" disabled="true">
-      <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
-    </button>
+    <div id="disabled-button-wrapper" tabindex="0" rel="tooltip" data-placement="bottom" data-toggle="tooltip" data-html="true" data-trigger="manual" data-title="<%= t('plugins.aeon_fulfillment.requesting_disabled') %>">
+      <button class="btn btn-default page_action request" disabled="true" aria-disabled="true" >
+        <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
+      </button>
+      <span class="visually-hidden"><%= t('plugins.aeon_fulfillment.requesting_disabled') %></span>
+    </div>
 
   <% end %>
 

@@ -52,6 +52,48 @@ class AeonRecordMapper
         false
     end
 
+    # Determines if the :requestable_archival_record_levels setting is present
+    # and exlcudes the 'level' property of the current record.
+    def requestable_based_on_archival_record_level?
+
+        req_levels = self.repo_settings[:requestable_archival_record_levels]
+        if req_levels
+            is_whitelist = false
+            levels = []
+
+            # Determine if the list is a whitelist or a blacklist of levels.
+            # If the setting is just an array, assume that the list is a
+            # whitelist.
+            if req_levels.is_a?(Array)
+                is_whitelist = true
+                levels = req_levels
+            else
+                list_type = req_levels[:list_type]
+                is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
+                levels = (req_levels[:levels] || []).map {|level| level.downcase}
+            end
+
+            list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
+
+            Rails.logger.debug("Aeon Fulfillment Plugin") { ":requestable_archival_record_levels is a #{list_type_description}" }
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Record Level #{list_type_description}: #{levels}" }
+
+            # Determine the level of the current record.
+            level = ''
+            if self.record.json
+                level = (self.record.json['level'] || '').downcase
+            end
+
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Record's Level: \"#{level}\"" }
+
+            # If whitelist, check to see if the list of levels contains the level.
+            # Otherwise, check to make sure the level is not in the list.
+            return is_whitelist ? levels.include?(level) : !levels.include?(level)
+        end
+
+        true
+    end
+
     # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
@@ -317,5 +359,5 @@ class AeonRecordMapper
     end
 
 
-    protected :json_fields, :record_fields, :system_information
+    protected :json_fields, :record_fields, :system_information, :requestable_based_on_archival_record_level?
 end

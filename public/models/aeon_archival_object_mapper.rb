@@ -6,6 +6,11 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         super(archival_object)
     end
 
+    # Override of the show_action? from the AeonRecordMapper
+    def show_action?
+        return false if !super
+        return self.requestable_based_on_archival_record_level?
+    end
 
     # Override for AeonRecordMapper json_fields method. 
     def json_fields

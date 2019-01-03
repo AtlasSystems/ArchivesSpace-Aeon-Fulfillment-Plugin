@@ -6,7 +6,7 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         super(archival_object)
     end
 
-    # Override of the show_action? from the AeonRecordMapper
+    # Override of #show_action? from AeonRecordMapper
     def show_action?
         return false if !super
         return self.requestable_based_on_archival_record_level?

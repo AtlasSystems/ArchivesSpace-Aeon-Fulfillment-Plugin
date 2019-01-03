@@ -18,7 +18,7 @@ class AeonRecordMapper
       if @@mappers.has_key?(record.class)
         @@mappers[record.class].new(record)
       else
-        Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
+        Rails.logger.info("Aeon Fulfillment Plugin") { "This ArchivesSpace object type (#{record.class}) is not supported by this plugin." }
         raise
       end
     end
@@ -55,12 +55,12 @@ class AeonRecordMapper
     # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
-            Rails.logger.debug("Aeon Fulfillment Plugin -- Checking for plugin settings for the repository")
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for plugin settings for the repository" }
 
             if !self.repo_settings
-                Rails.logger.info("Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\".")
+                Rails.logger.info("Aeon Fulfillment Plugin") { "Could not find plugin settings for the repository: \"#{self.repo_code}\"." }
             else
-                Rails.logger.debug("Aeon Fulfillment Plugin -- Checking for top containers")
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for top containers" }
                 has_top_container = false
 
                 instances = self.record.json['instances']
@@ -86,14 +86,14 @@ class AeonRecordMapper
                 # then don't require containers
                 only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
 
-                Rails.logger.debug("Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}")
-                Rails.logger.debug("Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}")
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "Containers found?    #{has_top_container}" }
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "only_top_containers? #{only_top_containers}" }
 
                 return (has_top_container || !only_top_containers)
             end
 
         rescue Exception => e
-            Rails.logger.error("Aeon Fulfillment Plugin -- Failed to create Aeon Request action.")
+            Rails.logger.error("Aeon Fulfillment Plugin") { "Failed to create Aeon Request action." }
             Rails.logger.error(e.message)
             Rails.logger.error(e.backtrace.inspect)
 

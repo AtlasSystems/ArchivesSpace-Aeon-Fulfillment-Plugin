@@ -55,12 +55,12 @@ class AeonRecordMapper
     # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
-            puts "Aeon Fulfillment Plugin -- Checking for plugin settings for the repository"
+            Rails.logger.debug("Aeon Fulfillment Plugin -- Checking for plugin settings for the repository")
 
             if !self.repo_settings
-                puts "Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\"."
+                Rails.logger.info("Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\".")
             else
-                puts "Aeon Fulfillment Plugin -- Checking for top containers"
+                Rails.logger.debug("Aeon Fulfillment Plugin -- Checking for top containers")
                 has_top_container = false
 
                 instances = self.record.json['instances']
@@ -86,16 +86,16 @@ class AeonRecordMapper
                 # then don't require containers
                 only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
 
-                puts "Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}"
-                puts "Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}"
+                Rails.logger.debug("Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}")
+                Rails.logger.debug("Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}")
 
                 return (has_top_container || !only_top_containers)
             end
 
         rescue Exception => e
-            puts "Aeon Fulfillment Plugin -- Failed to create Aeon Request action."
-            puts e.message
-            puts e.backtrace.inspect
+            Rails.logger.error("Aeon Fulfillment Plugin -- Failed to create Aeon Request action.")
+            Rails.logger.error(e.message)
+            Rails.logger.error(e.backtrace.inspect)
 
         end
 

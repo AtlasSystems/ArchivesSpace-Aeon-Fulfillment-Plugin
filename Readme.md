@@ -8,21 +8,22 @@
 ## Table of Contents
 
 1. [ArchivesSpace Request Fulfillment via Aeon](#archivesspace-request-fulfillment-via-aeon)
-    1. [Table of Contents](#table-of-contents)
-    2. [Overview](#overview)
-    3. [Changelog](#changelog)
-    4. [Configuring Plugin Settings](#configuring-plugin-settings)
-        1. [Per Repository Configuration Options](#per-repository-configuration-options)
-        2. [Other Configuration Options](#other-configuration-options)
-        3. [Example Configuration](#example-configuration)
-        4. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
-    5. [Imported Fields](#imported-fields)
-        1. [Common Fields](#common-fields)
-        2. [Archival Object Fields](#archival-object-fields)
-        3. [Accession Fields](#accession-fields)
-    6. [OpenURL Mappings](#openurl-mappings)
-    7. [Custom Mappers](#custom-mappers)
-    8. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
+   1. [Table of Contents](#table-of-contents)
+   2. [Overview](#overview)
+   3. [Changelog](#changelog)
+   4. [Configuring Plugin Settings](#configuring-plugin-settings)
+      1. [Per Repository Configuration Options](#per-repository-configuration-options)
+      2. [Other Configuration Options](#other-configuration-options)
+      3. [Example Configuration](#example-configuration)
+   5. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
+   6. [Imported Fields](#imported-fields)
+      1. [Common Fields](#common-fields)
+      2. [Archival Object Fields](#archival-object-fields)
+      3. [Accession Fields](#accession-fields)
+      4. [Resource Fields](#resource-fields)
+   7. [OpenURL Mappings](#openurl-mappings)
+   8. [Custom Mappers](#custom-mappers)
+   9. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
 
 
 ## Overview
@@ -364,14 +365,88 @@ specific to requests made for Archival Object records.
 
 ### Accession Fields
 
-In addition to the fields specified above, the following additional fields are
-specific to requests made for Accession records.
+In addition to the fields specified in the list of common fields, the following
+additional fields are specific to requests made for Accession records.
 
 - `use_restrictions_note`
 - `access_restrictions_note`
 - `language`
     - This field is also present on most Archival Object requests, but it is 
       mapped from a different location for Accession requests. 
+- `id`
+- `user_defined_boolean_1`
+- `user_defined_boolean_2`
+- `user_defined_boolean_3`
+- `user_defined_integer_1`
+- `user_defined_integer_2`
+- `user_defined_integer_3`
+- `user_defined_real_1`
+- `user_defined_real_2`
+- `user_defined_real_3`
+- `user_defined_string_1`
+- `user_defined_string_2`
+- `user_defined_string_3`
+- `user_defined_string_4`
+- `user_defined_text_1`
+- `user_defined_text_2`
+- `user_defined_text_3`
+- `user_defined_text_4`
+- `user_defined_text_5`
+- `user_defined_date_1`
+- `user_defined_date_2`
+- `user_defined_date_3`
+- `user_defined_enum_1`
+- `user_defined_enum_2`
+- `user_defined_enum_3`
+- `user_defined_enum_4`
+
+### Resource Fields
+
+In addition to the fields specified in the list of common fields, the following
+additional fields are specific to requests made for Resource records.
+
+- `repository_processing_note`
+- `id`
+- `user_defined_boolean_1`
+- `user_defined_boolean_2`
+- `user_defined_boolean_3`
+- `user_defined_integer_1`
+- `user_defined_integer_2`
+- `user_defined_integer_3`
+- `user_defined_real_1`
+- `user_defined_real_2`
+- `user_defined_real_3`
+- `user_defined_string_1`
+- `user_defined_string_2`
+- `user_defined_string_3`
+- `user_defined_string_4`
+- `user_defined_text_1`
+- `user_defined_text_2`
+- `user_defined_text_3`
+- `user_defined_text_4`
+- `user_defined_text_5`
+- `user_defined_date_1`
+- `user_defined_date_2`
+- `user_defined_date_3`
+- `user_defined_enum_1`
+- `user_defined_enum_2`
+- `user_defined_enum_3`
+- `user_defined_enum_4`
+- `ead_id`
+- `ead_location`
+- `finding_aid_title`
+- `finding_aid_subtitle`
+- `finding_aid_filing_title`
+- `finding_aid_date`
+- `finding_aid_author`
+- `finding_aid_description_rules`
+- `resource_finding_aid_description_rules`
+- `finding_aid_language`
+- `finding_aid_sponsor`
+- `finding_aid_edition_statement`
+- `finding_aid_series_statement`
+- `finding_aid_status`
+- `finding_aid_note`
 
 
 ## OpenURL Mappings

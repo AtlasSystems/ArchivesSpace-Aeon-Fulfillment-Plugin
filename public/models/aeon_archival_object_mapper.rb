@@ -14,7 +14,7 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         json = self.record.json
         if !json
             return mappings
-        end 
+        end
 
         if json['repository_processing_note'] && json['repository_processing_note'].present?
             mappings['repository_processing_note'] = json['repository_processing_note']
@@ -22,7 +22,6 @@ class AeonArchivalObjectMapper < AeonRecordMapper
 
         return mappings
     end
-
 
     # Returns a hash that maps from Aeon OpenURL values to values in the provided record.
     def record_fields

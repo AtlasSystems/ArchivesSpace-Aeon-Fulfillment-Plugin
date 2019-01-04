@@ -243,6 +243,7 @@ AppConfig[:aeon_fulfillment] = {
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace",
         :aeon_site_code => "SPECCOLL",
+        :aeon_fulfillment_record_types => ['accession', 'archival_object'],
         :requests_permitted_for_containers_only => true
     },
     "test special collections" => {
@@ -250,6 +251,7 @@ AppConfig[:aeon_fulfillment] = {
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace Test",
         :aeon_site_code => "TEST",
+        :aeon_fulfillment_record_types => ['accession', 'archival_object', 'resource'],
         :requests_permitted_for_containers_only => false
     }
 }

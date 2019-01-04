@@ -53,7 +53,9 @@ class AeonRecordMapper
     end
 
     # Determines if the :requestable_archival_record_levels setting is present
-    # and exlcudes the 'level' property of the current record.
+    # and exlcudes the 'level' property of the current record. This method is
+    # not used by this class, because not all implementations of "abstract_archival_object"
+    # have a "level" property that uses the "archival_record_level" enumeration.
     def requestable_based_on_archival_record_level?
 
         req_levels = self.repo_settings[:requestable_archival_record_levels]
@@ -81,7 +83,7 @@ class AeonRecordMapper
             # Determine the level of the current record.
             level = ''
             if self.record.json
-                level = (self.record.json['level'] || '').downcase
+                level = self.record.json['level'] || ''
             end
 
             Rails.logger.debug("Aeon Fulfillment Plugin") { "Record's Level: \"#{level}\"" }

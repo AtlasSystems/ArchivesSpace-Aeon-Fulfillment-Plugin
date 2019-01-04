@@ -70,7 +70,7 @@ class AeonRecordMapper
             else
                 list_type = req_levels[:list_type]
                 is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
-                levels = (req_levels[:levels] || []).map {|level| level.downcase}
+                levels = req_levels[:values] || req_levels[:levels] || []
             end
 
             list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'

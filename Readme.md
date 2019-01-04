@@ -329,13 +329,15 @@ left of the built in buttons.
 ```ruby
 AppConfig[:plugins] << "aeon_fulfillment"
 
+AppConfig[:aeon_fulfillment_record_types] = ['accession', 'archival_object', 'resource']
+AppConfig[:aeon_fulfillment_button_position] = 2
+
 AppConfig[:aeon_fulfillment] = {
     "special research collections" => {
         :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace",
         :aeon_site_code => "SPECCOLL",
-        :aeon_fulfillment_record_types => ['accession', 'archival_object'],
         :requests_permitted_for_containers_only => true
     },
     "test special collections" => {
@@ -343,7 +345,6 @@ AppConfig[:aeon_fulfillment] = {
         :aeon_return_link_label => "Back to ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace Test",
         :aeon_site_code => "TEST",
-        :aeon_fulfillment_record_types => ['accession', 'archival_object', 'resource'],
         :requests_permitted_for_containers_only => false
     }
 }
@@ -579,7 +580,7 @@ support other record types, specify the list of supported record type in
 configuration like this:
 
 ```ruby
-  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'other_record_type']
+  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'custom_record_type']
 ```
 
 It is possible to override the default mappers by providing a custom mapper class.

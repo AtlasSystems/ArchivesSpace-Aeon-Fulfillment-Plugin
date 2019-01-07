@@ -468,8 +468,7 @@ additional fields are specific to requests made for Accession records.
 - `language`
     - This field is also present on most Archival Object requests, but it is 
       mapped from a different location for Accession requests. 
-- `collection_id`
-- `collection_title`
+- `accession_id`
 - `user_defined_boolean_1`
 - `user_defined_boolean_2`
 - `user_defined_boolean_3`
@@ -502,7 +501,8 @@ In addition to the fields specified in the list of common fields, the following
 additional fields are specific to requests made for Resource records.
 
 - `repository_processing_note`
-- `id`
+- `collection_id`
+- `collection_title`
 - `user_defined_boolean_1`
 - `user_defined_boolean_2`
 - `user_defined_boolean_3`

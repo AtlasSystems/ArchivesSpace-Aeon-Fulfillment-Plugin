@@ -10,7 +10,7 @@ class AeonAccessionMapper < AeonRecordMapper
         mappings = super
 
         accession_identifier = [ json['id_0'], json['id_1'], json['id_2'], json['id_3'] ]
-        mappings['id'] = accession_identifier
+        mappings['accession_id'] = accession_identifier
             .reject {|id_comp| id_comp.blank?}
             .join('-')
 

@@ -468,7 +468,8 @@ additional fields are specific to requests made for Accession records.
 - `language`
     - This field is also present on most Archival Object requests, but it is 
       mapped from a different location for Accession requests. 
-- `id`
+- `collection_id`
+- `collection_title`
 - `user_defined_boolean_1`
 - `user_defined_boolean_2`
 - `user_defined_boolean_3`

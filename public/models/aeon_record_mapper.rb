@@ -316,6 +316,9 @@ class AeonRecordMapper
         return mappings
     end
 
+    def find_instances (record)
 
-    protected :json_fields, :record_fields, :system_information
+    end
+
+    protected :json_fields, :record_fields, :system_information, :find_instances
 end

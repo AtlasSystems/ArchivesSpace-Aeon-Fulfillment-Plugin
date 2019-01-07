@@ -11,16 +11,16 @@ class AeonRecordMapper
     end
 
     def self.register_for_record_type(type)
-      @@mappers[type] = self
+        @@mappers[type] = self
     end
 
     def self.mapper_for(record)
-      if @@mappers.has_key?(record.class)
-        @@mappers[record.class].new(record)
-      else
-        Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
-        raise
-      end
+        if @@mappers.has_key?(record.class)
+            @@mappers[record.class].new(record)
+        else
+            Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
+            raise
+        end
     end
 
     def repo_code

@@ -1,5 +1,7 @@
 class AeonResourceMapper < AeonRecordMapper
 
+    include ManipulateNode
+
     register_for_record_type(Resource)
 
     def initialize(resource)
@@ -26,9 +28,11 @@ class AeonResourceMapper < AeonRecordMapper
         end
         
         resource_identifier = [ json['id_0'], json['id_1'], json['id_2'], json['id_3'] ]
-        mappings['id'] = resource_identifier
+        mappings['collection_id'] = resource_identifier
             .reject {|id_comp| id_comp.blank?}
             .join('-')
+
+        mappings['collection_title'] = strip_mixed_content(self.record['title'])
 
         mappings['ead_id'] = json['ead_id']
         mappings['ead_location'] = json['ead_location']

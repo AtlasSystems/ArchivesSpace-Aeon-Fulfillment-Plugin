@@ -67,7 +67,6 @@ class AeonRecordMapper
             else
                 puts "Aeon Fulfillment Plugin -- Checking for top containers"
 
-                # TODO: length of self.container_instances
                 has_top_container = record.is_a?(Container) || self.container_instances.any?
 
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false

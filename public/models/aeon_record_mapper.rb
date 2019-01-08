@@ -305,6 +305,10 @@ class AeonRecordMapper
         return mappings
     end
 
+    # Grabs a list of instances from the given jsonmodel, ignoring any digital object
+    # instances. If the current jsonmodel does not have any top container instances, the
+    # method will recurse up the record's resource tree, until it finds a record that does
+    # have top container instances, and will pull the list of instances from there.
     def find_container_instances (record_json)
 
         current_uri = record_json['uri']

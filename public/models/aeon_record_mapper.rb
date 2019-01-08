@@ -255,59 +255,59 @@ class AeonRecordMapper
                 request["instance_created_by_#{instance_count}"] = instance['created_by']
 
                 container = instance['sub_container']
-                if container
-                    request["instance_container_grandchild_indicator_#{instance_count}"] = container['indicator_3']
-                    request["instance_container_child_indicator_#{instance_count}"] = container['indicator_2']
-                    request["instance_container_grandchild_type_#{instance_count}"] = container['type_3']
-                    request["instance_container_child_type_#{instance_count}"] = container['type_2']
+                return request unless container
 
-                    request["instance_container_last_modified_by_#{instance_count}"] = container['last_modified_by']
-                    request["instance_container_created_by_#{instance_count}"] = container['created_by']
+                request["instance_container_grandchild_indicator_#{instance_count}"] = container['indicator_3']
+                request["instance_container_child_indicator_#{instance_count}"] = container['indicator_2']
+                request["instance_container_grandchild_type_#{instance_count}"] = container['type_3']
+                request["instance_container_child_type_#{instance_count}"] = container['type_2']
+                request["instance_container_last_modified_by_#{instance_count}"] = container['last_modified_by']
+                request["instance_container_created_by_#{instance_count}"] = container['created_by']
 
-                    top_container = container['top_container']
-                    if top_container
-                        request["instance_top_container_ref_#{instance_count}"] = top_container['ref']
+                top_container = container['top_container']
+                return request unless top_container
 
-                        top_container_resolved = top_container['_resolved']
-                        if top_container_resolved
-                            request["instance_top_container_long_display_string_#{instance_count}"] = top_container_resolved['long_display_string']
-                            request["instance_top_container_last_modified_by_#{instance_count}"] = top_container_resolved['last_modified_by']
-                            request["instance_top_container_display_string_#{instance_count}"] = top_container_resolved['display_string']
-                            request["instance_top_container_restricted_#{instance_count}"] = top_container_resolved['restricted']
-                            request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
-                            request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
-                            request["instance_top_container_barcode_#{instance_count}"] = top_container_resolved['barcode']
-                            request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
-                            request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
+                request["instance_top_container_ref_#{instance_count}"] = top_container['ref']
 
-                            collection = top_container_resolved['collection']
-                            if collection
-                                request["instance_top_container_collection_identifier_#{instance_count}"] = collection
-                                    .select { |c| c['identifier'].present? }
-                                    .map { |c| c['identifier'] }
-                                    .join("; ")
+                top_container_resolved = top_container['_resolved']
+                return request unless top_container_resolved
 
-                                request["instance_top_container_collection_display_string_#{instance_count}"] = collection
-                                    .select { |c| c['display_string'].present? }
-                                    .map { |c| c['display_string'] }
-                                    .join("; ")
-                            end
+                request["instance_top_container_long_display_string_#{instance_count}"] = top_container_resolved['long_display_string']
+                request["instance_top_container_last_modified_by_#{instance_count}"] = top_container_resolved['last_modified_by']
+                request["instance_top_container_display_string_#{instance_count}"] = top_container_resolved['display_string']
+                request["instance_top_container_restricted_#{instance_count}"] = top_container_resolved['restricted']
+                request["instance_top_container_created_by_#{instance_count}"] = top_container_resolved['created_by']
+                request["instance_top_container_indicator_#{instance_count}"] = top_container_resolved['indicator']
+                request["instance_top_container_barcode_#{instance_count}"] = top_container_resolved['barcode']
+                request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
+                request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
-                            series = top_container_resolved['series']
-                            if series
-                                request["instance_top_container_series_identifier_#{instance_count}"] = series
-                                    .select { |s| s['identifier'].present? }
-                                    .map { |s| s['identifier'] }
-                                    .join("; ")
 
-                                request["instance_top_container_series_display_string_#{instance_count}"] = series
-                                    .select { |s| s['display_string'].present? }
-                                    .map { |s| s['display_string'] }
-                                    .join("; ")
-                            end
+                collection = top_container_resolved['collection']
+                if collection
+                    request["instance_top_container_collection_identifier_#{instance_count}"] = collection
+                        .select { |c| c['identifier'].present? }
+                        .map { |c| c['identifier'] }
+                        .join("; ")
 
-                        end
-                    end
+                    request["instance_top_container_collection_display_string_#{instance_count}"] = collection
+                        .select { |c| c['display_string'].present? }
+                        .map { |c| c['display_string'] }
+                        .join("; ")
+                end
+
+                series = top_container_resolved['series']
+                if series
+                    request["instance_top_container_series_identifier_#{instance_count}"] = series
+                        .select { |s| s['identifier'].present? }
+                        .map { |s| s['identifier'] }
+                        .join("; ")
+
+                    request["instance_top_container_series_display_string_#{instance_count}"] = series
+                        .select { |s| s['display_string'].present? }
+                        .map { |s| s['display_string'] }
+                        .join("; ")
+
                 end
 
                 request

@@ -307,32 +307,39 @@ class AeonRecordMapper
 
     def find_container_instances (record_json)
 
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for Top Container instances..." }
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "Record: #{record_json.inspect}" }
+        current_uri = record_json['uri']
+        
+        Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "#{record_json.to_json}" }
 
-        instances = (record_json['instances'] || [])
+        instances = record_json['instances']
             .reject { |instance| instance['digital_object'] }
-            .select { |instance| instance['sub_container'] && instance['sub_container']['top_container'] }
 
         if instances.any?
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Top Container instances were found" }
+            Rails.logger.info("Aeon Fulfillment Plugin") { "Top Container instances found" }
             return instances
         end
 
-        if record_json['parent']
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. Checking parent." }
-            parent = archivesspace.get_record(record_json['parent']['ref'])
-            return find_container_instances(parent)
-        end
+        parent_uri = ''
 
-        if record_json['resource']
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. Checking parent resource." }
-            parent_resource = archivesspace.get_record(record_json['resource']['ref'])
-            return find_container_instances(parent_resource)
+        if record_json['parent'].present?
+            parent_uri = record_json['parent']['ref']
+            parent_uri = record_json['parent'] unless parent_uri.present?
+        elsif record_json['resource'].present?
+            parent_uri = record_json['resource']['ref']
+            parent_uri = record_json['resource'] unless parent_uri.present?
         end
+        
+        if parent_uri.present?
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
+            parent = archivesspace.get_record(parent_uri)
+            parent_json = parent['json']
+            return find_container_instances(parent_json)
+        end
+        
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found." }
 
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. No parent." }
-        return []
+        []
     end
 
     protected :json_fields, :record_fields, :system_information, :find_container_instances

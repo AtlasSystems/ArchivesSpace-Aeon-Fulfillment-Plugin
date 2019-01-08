@@ -4,10 +4,15 @@ class AeonRecordMapper
 
     @@mappers = {}
 
-    attr_reader :record
+    attr_reader :record, :container_instances
 
     def initialize(record)
         @record = record
+        @container_instances = find_container_instances(record['json'] || {})
+    end
+    
+    def archivesspace
+        ArchivesSpaceClient.instance
     end
 
     def self.register_for_record_type(type)
@@ -61,24 +66,9 @@ class AeonRecordMapper
                 puts "Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\"."
             else
                 puts "Aeon Fulfillment Plugin -- Checking for top containers"
-                has_top_container = false
 
-                instances = self.record.json['instances']
-                if instances
-                    instances.each do |instance|
-
-                        sub_container = instance.dig('sub_container')
-                        next if !sub_container
-
-                        top_container_uri = sub_container.dig('top_container', 'ref')
-
-                        if top_container_uri.present?
-                            has_top_container = true
-                        end
-                    end
-                end
-
-                has_top_container = true if record.is_a?(Container)
+                # TODO: length of self.container_instances
+                has_top_container = record.is_a?(Container) || self.container_instances.any?
 
                 only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
 
@@ -234,13 +224,12 @@ class AeonRecordMapper
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
-        instances = json.fetch('instances', false)
+        instances = self.container_instances
         if !instances
             return mappings
         end
 
         mappings['requests'] = instances
-            .select{ |instance| !instance['digital_object'] }
             .each_with_index
             .map { |instance, i|
                 request = {}
@@ -316,9 +305,35 @@ class AeonRecordMapper
         return mappings
     end
 
-    def find_instances (record)
+    def find_container_instances (record_json)
 
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for Top Container instances..." }
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "Record: #{record_json.inspect}" }
+
+        instances = (record_json['instances'] || [])
+            .reject { |instance| instance['digital_object'] }
+            .select { |instance| instance['sub_container'] && instance['sub_container']['top_container'] }
+
+        if instances.any?
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Top Container instances were found" }
+            return instances
+        end
+
+        if record_json['parent']
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. Checking parent." }
+            parent = archivesspace.get_record(record_json['parent']['ref'])
+            return find_container_instances(parent)
+        end
+
+        if record_json['resource']
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. Checking parent resource." }
+            parent_resource = archivesspace.get_record(record_json['resource']['ref'])
+            return find_container_instances(parent_resource)
+        end
+
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "No instances. No parent." }
+        return []
     end
 
-    protected :json_fields, :record_fields, :system_information, :find_instances
+    protected :json_fields, :record_fields, :system_information, :find_container_instances
 end

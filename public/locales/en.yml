@@ -3,4 +3,4 @@ en:
     aeon_fulfillment:
       request_button_icon: fa fa-external-link fa-3x
       request_button_label: Aeon Request
-      requesting_disabled: This record cannot be sent in a request.
+      requesting_disabled: Requesting is not available for this record.

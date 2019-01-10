@@ -154,7 +154,17 @@ class AeonRecordMapper
         if resolved_resource
             resource_obj = resolved_resource[self.record['resource']]
             if resource_obj
-                mappings['collection_id'] = "#{resource_obj[0]['id_0']} #{resource_obj[0]['id_1']} #{resource_obj[0]['id_2']} #{resource_obj[0]['id_3']}".rstrip
+                collection_id_components = [
+                    resource_obj[0]['id_0'],
+                    resource_obj[0]['id_1'],
+                    resource_obj[0]['id_2'],
+                    resource_obj[0]['id_3']
+                ]
+
+                mappings['collection_id'] = collection_id_components
+                    .reject {|id_comp| id_comp.blank?}
+                    .join('-')
+                    
                 mappings['collection_title'] = resource_obj[0]['title']
             end
         end

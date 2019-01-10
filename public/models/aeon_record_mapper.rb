@@ -290,9 +290,7 @@ class AeonRecordMapper
         mappings = {}
 
         json = self.record.json
-        if !json
-            return mappings
-        end
+        return mappings unless json
 
         mappings['language'] = json['language']
 
@@ -319,9 +317,7 @@ class AeonRecordMapper
         mappings['display_string'] = json['display_string']
 
         instances = self.container_instances
-        if !instances
-            return mappings
-        end
+        return mappings unless instances
 
         mappings['requests'] = instances
             .each_with_index
@@ -396,7 +392,7 @@ class AeonRecordMapper
                 request
             }
 
-        return mappings
+        mappings
     end
 
     # Grabs a list of instances from the given jsonmodel, ignoring any digital object

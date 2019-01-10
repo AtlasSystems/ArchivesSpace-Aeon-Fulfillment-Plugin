@@ -54,13 +54,13 @@ class AeonRecordMapper
 
                     Rails.logger.debug("Aeon Fulfillment Plugin") { "Pulling in all user defined fields" }
                 else
-                    if req_levels.is_a?(Array)
+                    if udf_setting.is_a?(Array)
                         is_whitelist = true
                         fields = udf_setting
                     else
                         list_type = udf_setting[:list_type]
                         is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
-                        fields = req_levels[:fields] || req_levels[:values] || []
+                        fields = udf_setting[:values] || udf_setting[:fields] || []
                     end
 
                     list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'

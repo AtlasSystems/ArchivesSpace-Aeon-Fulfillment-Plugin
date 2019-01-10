@@ -42,10 +42,10 @@ class AeonRecordMapper
         # returning false to maintain the original behavior
         return false unless self.repo_settings
 
-        return true if self.repo_settings.fetch(:hide_request_button, false)
-        return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
+        return true if self.repo_settings[:hide_request_button]
+        return true if self.repo_settings[:hide_button_for_accessions] && record.is_a?(Accession)
 
-        if (types = self.repo_settings.fetch(:hide_button_for_access_restriction_types, false))
+        if (types = self.repo_settings[:hide_button_for_access_restriction_types])
           notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
                                               .map {|n| n['rights_restriction']['local_access_restriction_type']}
                                               .flatten.uniq
@@ -62,9 +62,7 @@ class AeonRecordMapper
     # not used by this class, because not all implementations of "abstract_archival_object"
     # have a "level" property that uses the "archival_record_level" enumeration.
     def requestable_based_on_archival_record_level?
-
-        req_levels = self.repo_settings[:requestable_archival_record_levels]
-        if req_levels
+        if (req_levels = self.repo_settings[:requestable_archival_record_levels])
             is_whitelist = false
             levels = []
 
@@ -81,7 +79,6 @@ class AeonRecordMapper
             end
 
             list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
-
             Rails.logger.debug("Aeon Fulfillment Plugin") { ":requestable_archival_record_levels is a #{list_type_description}" }
             Rails.logger.debug("Aeon Fulfillment Plugin") { "Record Level #{list_type_description}: #{levels}" }
 
@@ -95,7 +92,7 @@ class AeonRecordMapper
 
             # If whitelist, check to see if the list of levels contains the level.
             # Otherwise, check to make sure the level is not in the list.
-            return is_whitelist ? levels.include?(level) : !levels.include?(level)
+            return is_whitelist ? levels.include?(level) : levels.exclude?(level)
         end
 
         true

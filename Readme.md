@@ -252,7 +252,7 @@ By default, no restriction types are hidden.
 
 #### `:requestable_archival_record_levels`
 
-This setting allows sites to restrict thy types of Resources and Archival
+This setting allows sites to restrict the types of Resources and Archival
 Objects that are requestable, using the "level" property of the record. 
 
 - The setting accepts a few different configurations, specifying either a

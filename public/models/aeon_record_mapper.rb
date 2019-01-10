@@ -36,6 +36,49 @@ class AeonRecordMapper
         AppConfig[:aeon_fulfillment][self.repo_code]
     end
 
+    def user_defined_fields
+        mappings = {}
+
+        if (udf_setting = self.repo_settings[:user_defined_fields])
+            if (user_defined_fields = (self.record['json'] || {})['user_defined'])
+            
+                # Determine if the list is a whitelist or a blacklist of fields.
+                # If the setting is just an array, assume that the list is a
+                # whitelist.
+                if udf_setting == true
+                    # If the setting is set to "true", then all fields should be
+                    # pulled in. This is implemented as a blacklist that contains
+                    # 0 values.
+                    is_whitelist = false
+                    fields = []
+
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { "Pulling in all user defined fields" }
+                else
+                    if req_levels.is_a?(Array)
+                        is_whitelist = true
+                        fields = udf_setting
+                    else
+                        list_type = udf_setting[:list_type]
+                        is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
+                        fields = req_levels[:fields] || req_levels[:values] || []
+                    end
+
+                    list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { ":allow_user_defined_fields is a #{list_type_description}" }
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { "User Defined Field #{list_type_description}: #{fields}" }
+                end
+
+                user_defined_fields.each do |field_name, value|
+                    if (is_whitelist ? fields.include?(field_name) : fields.exclude?(field_name))
+                        mappings["user_defined_#{field_name}"] = value
+                    end
+                end
+            end
+        end
+
+        mappings
+    end
+
     # This method tests whether the button should be hidden. This determination is based
     # on the settings for the repository and defaults to false.
     def hide_button?
@@ -141,6 +184,7 @@ class AeonRecordMapper
             .merge(self.system_information)
             .merge(self.json_fields)
             .merge(self.record_fields)
+            .merge(self.user_defined_fields)
 
         return mappings
     end
@@ -396,5 +440,7 @@ class AeonRecordMapper
         []
     end
 
-    protected :json_fields, :record_fields, :system_information, :requestable_based_on_archival_record_level?, :find_container_instances
+    protected :json_fields, :record_fields, :system_information,
+              :requestable_based_on_archival_record_level?,
+              :find_container_instances, :user_defined_fields
 end

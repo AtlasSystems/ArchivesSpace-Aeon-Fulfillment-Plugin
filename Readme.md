@@ -134,6 +134,7 @@ ArchivesSpace may cause changes in the functionality of this plugin.
       container instance information.
     - Added hover text to the "Aeon Request" button when it is disabled. This
       text is accessible through screen readers.
+    - Changed log statements to use the default Rails logger
 
 ## Configuring Plugin Settings
 

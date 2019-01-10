@@ -1,5 +1,5 @@
 <%
-puts "Aeon Fulfillment Plugin -- Initializing Plugin..."
+Rails.logger.info("Aeon Fulfillment Plugin") { "Initializing Plugin..." }
 
 mapper = AeonRecordMapper.mapper_for(record)
 %>
@@ -41,5 +41,5 @@ mapper = AeonRecordMapper.mapper_for(record)
 <% end %>
 
 <% 
-  puts "Aeon Fulfillment Plugin -- Finished initializing plugin." 
+  Rails.logger.info("Aeon Fulfillment Plugin") { "Finished initializing plugin." }
 %>

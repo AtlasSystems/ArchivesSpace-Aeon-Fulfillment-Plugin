@@ -2,27 +2,40 @@
 
 **Version:** 20180726
 
-**Last Updated:** December 3, 2018
+**Last Updated:** January 4, 2019
 
 
 ## Table of Contents
 
 1. [ArchivesSpace Request Fulfillment via Aeon](#archivesspace-request-fulfillment-via-aeon)
-    1. [Table of Contents](#table-of-contents)
-    2. [Overview](#overview)
-    3. [Changelog](#changelog)
-    4. [Configuring Plugin Settings](#configuring-plugin-settings)
-        1. [Per Repository Configuration Options](#per-repository-configuration-options)
-        2. [Other Configuration Options](#other-configuration-options)
-        3. [Example Configuration](#example-configuration)
-        4. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
-    5. [Imported Fields](#imported-fields)
-        1. [Common Fields](#common-fields)
-        2. [Archival Object Fields](#archival-object-fields)
-        3. [Accession Fields](#accession-fields)
-    6. [OpenURL Mappings](#openurl-mappings)
-    7. [Custom Mappers](#custom-mappers)
-    8. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
+   1. [Table of Contents](#table-of-contents)
+   2. [Overview](#overview)
+   3. [Changelog](#changelog)
+   4. [Configuring Plugin Settings](#configuring-plugin-settings)
+      1. [Per Repository Configuration Options](#per-repository-configuration-options)
+         1. [`:aeon_web_url`](#aeonweburl)
+         2. [`:aeon_return_link_label`](#aeonreturnlinklabel)
+         3. [`:aeon_external_system_id`](#aeonexternalsystemid)
+         4. [`:requests_permitted_for_containers_only`](#requestspermittedforcontainersonly)
+         5. [`:request_in_new_tab`](#requestinnewtab)
+         6. [`:hide_request_button`](#hiderequestbutton)
+         7. [`:hide_button_for_accessions`](#hidebuttonforaccessions)
+         8. [`:aeon_site_code`](#aeonsitecode)
+         9. [`:hide_button_for_access_restriction_types`](#hidebuttonforaccessrestrictiontypes)
+         10. [`:requestable_archival_record_levels`](#requestablearchivalrecordlevels)
+      2. [Other Configuration Options](#other-configuration-options)
+         1. [`:aeon_fulfillment_record_types`](#aeonfulfillmentrecordtypes)
+         2. [`:aeon_fulfillment_button_position`](#aeonfulfillmentbuttonposition)
+      3. [Example Configuration](#example-configuration)
+   5. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
+   6. [Imported Fields](#imported-fields)
+      1. [Common Fields](#common-fields)
+      2. [Archival Object Fields](#archival-object-fields)
+      3. [Accession Fields](#accession-fields)
+      4. [Resource Fields](#resource-fields)
+   7. [OpenURL Mappings](#openurl-mappings)
+   8. [Custom Mappers](#custom-mappers)
+   9. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
 
 
 ## Overview
@@ -170,50 +183,126 @@ AppConfig[:aeon_fulfillment] = {
 
 ### Per Repository Configuration Options
 
-- **:aeon\_web\_url**. (Required). This setting specifies the web url that 
-  points to an Aeon installation. The plugin will send requests to this url, 
-  after adding the external requests endpoint (`?action=11&type=200`) 
-  to the end. If you are using the Atlas Dual Auth Portal, this setting should
-  point to that URL instead (https://institution.dualauthurl.edu/login/").
+#### `:aeon_web_url`
 
-- **:aeon\_return\_link\_label**. (Required). This setting specifies the text 
-  that will display on the button that takes users back to ArchivesSpace. 
-  Setting either `AppConfig[:public_proxy_url]` or `AppConfig[:public_url]`
-  in `config/config.rb` will influence the *link* associated with this label.
-  See the `ReturnLinkURL` field below.
+**Required.** This setting specifies the web url that points to an Aeon
+installation. The plugin will send requests to this url, after adding the
+external requests endpoint (`?action=11&type=200`) to the end. If you are using
+the Atlas Dual Auth Portal, this setting should point to that URL instead
+(https://dualauthurl.institution.edu/login/").
 
-- **:requests\_permitted\_for\_containers\_only**. This settings specifies 
-  whether requests are limited to resources with top containers only. The 
-  default for this setting is `false`. 
+#### `:aeon_return_link_label`
 
-- **:aeon\_external\_system\_id**. This setting specifies the System ID, which 
-  is used by Aeon to determine which mapping rules to use from its 
-  OpenURLMapping table. Each repository configuration can have their own 
-  System ID or they can have a duplicate System ID. 
+**Required.** This setting specifies the text that will display on the button
+that takes users back to ArchivesSpace. Setting either `AppConfig[:public_proxy_url]`
+or `AppConfig[:public_url]` in `config/config.rb` will influence the *link*
+associated with this label. See the `ReturnLinkURL` field below.
 
-- **:request\_in\_new\_tab**. This setting allows the Aeon request to appear
-  in a different tab, when set to `true`. Defaults to `false`.
+#### `:aeon_external_system_id`
 
-- **:hide\_request\_button**. This setting allows the request button to be
-  hidden for the repository, when set to `true`. The button is hidden
-  completely rather than shown disabled. Defaults to `false`.
+**Required.** This setting specifies the System ID, which is used by Aeon to
+determine which mapping rules to use from its OpenURLMapping table. Each
+repository configuration can have their own System ID or they can have a
+duplicate System ID.
 
-- **:hide\_button\_for\_accessions**. This setting allows the request
-  button to be hidden for accessions, when set to `true`. Defaults to
-  `false`.
+#### `:requests_permitted_for_containers_only`
 
-- **:aeon\_site\_code**. This setting specifies the Aeon site code for a
-  repository. If this setting is not specified in the settings for the
-  repository, no Aeon site code will be sent.
+This settings specifies whether requests are limited to resources with top
+containers only. The default for this setting is `false`.
 
-- **:hide\_button\_for\_access\_restriction\_types**. This setting allows the
-  request button to be hidden for any records that have any of the listed
-  local access restriction types. The value of this config item should be an
-  array of restriction types, for example:
-  
-  `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']` 
-  
-  By default, no restriction types are hidden.
+#### `:request_in_new_tab`
+
+This setting allows the Aeon request to appear in a different tab, when set to
+`true`. Defaults to `false`.
+
+#### `:hide_request_button`
+
+This setting allows the request button to be hidden for the repository, when set
+to `true`. The button is hidden completely rather than shown disabled. Defaults
+to `false`.
+
+#### `:hide_button_for_accessions`
+
+This setting allows the request button to be hidden for accessions, when set to
+`true`. Defaults to `false`.
+
+#### `:aeon_site_code`
+
+This setting specifies the Aeon site code for a repository. If this setting is
+not specified in the settings for the repository, no Aeon site code will be
+sent.
+
+#### `:hide_button_for_access_restriction_types`
+
+This setting allows the request button to be hidden for any records that have
+any of the listed local access restriction types. The value of this config item
+should be an array of restriction types, for example:
+
+`:hide_button_for_access_restriction_types => ['RestrictedSpecColl']` 
+
+By default, no restriction types are hidden.
+
+#### `:requestable_archival_record_levels`
+
+This setting allows sites to restrict thy types of Resources and Archival
+Objects that are requestable, using the "level" property of the record. 
+
+- The setting accepts a few different configurations, specifying either a
+  "whitelist" or a "blacklist" of levels that should either have requesting
+  enabled, or disabled.
+- The values that are specified in this list must be entries in the Archival
+  Record Level (`archival_record_level`) controlled value list. This list can be
+  accessed in the Staff interface through
+  http://archivesspace-staff.yourinstitution.edu/enumerations?id=32. The values
+  specified in this setting must match the "Value" column of the enumeration.
+  The "Translation" column of the enumeration CANNOT be used.
+
+**Example 1:** Specifies a whitelist. Under this configuration, only Resources
+and Archival Objects that have a level of either "item" or "file" will be
+requestable.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :requestable_archival_record_levels => ["item", "file"]
+    }
+}
+```
+
+**Example 2:** Specifies a whitelist. Under this configuration, only Resources
+and Archival Objects that have a level of either "item" or "file" will be
+requestable. This configuration functions identically to the example
+demonstrated in Example 1.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :requestable_archival_record_levels => {
+            :list_type => :whitelist,
+            :values => ["item", "file"]
+        }
+    }
+}
+```
+
+**Example 3:** Specifies a blacklist. Under this configuration, Resources and
+Archival Objects that have a level of either "Collection", "Series",
+"Sub-Series", "Record Group", or "Sub-Group" cannot be requested through this
+plugin.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :requestable_archival_record_levels => {
+            :list_type => :blacklist,
+            :values => ["collection", "series", "subseries", "recordgrp", "subgrp"]
+        }
+    }
+}
+```
 
 
 ### Other Configuration Options
@@ -221,20 +310,27 @@ AppConfig[:aeon_fulfillment] = {
 The following configuration options apply globally, rather than for a particular
 repository.
 
-- **:aeon\_fulfillment\_record\_types**. This setting takes an array of record
-  types. It allows this plugin to handle additional record types via [custom
-  mappers (see below)](#custom-mappers).
+#### `:aeon_fulfillment_record_types`
 
-- **:aeon\_fulfillment\_button\_position**. This setting supports the positioning
-  of the request button relative to the other buttons appearing on a page. By default
-  the button will appear to the right of all built in buttons and to the left of any
-  plugin buttons loaded after it. Setting this to `0` will cause the request button
-  to appear to the left of the built in buttons.
+This setting takes an array of record types. It allows this plugin to handle
+additional record types via [custom mappers (see below)](#custom-mappers).
+
+#### `:aeon_fulfillment_button_position`
+
+This setting supports the positioning of the request button relative to the
+other buttons appearing on a page. By default the button will appear to the
+right of all built in buttons and to the left of any plugin buttons loaded
+after it. Setting this to `0` will cause the request button to appear to the
+left of the built in buttons.
+
 
 ### Example Configuration
 
 ```ruby
 AppConfig[:plugins] << "aeon_fulfillment"
+
+AppConfig[:aeon_fulfillment_record_types] = ['accession', 'archival_object', 'resource']
+AppConfig[:aeon_fulfillment_button_position] = 2
 
 AppConfig[:aeon_fulfillment] = {
     "special research collections" => {
@@ -364,14 +460,39 @@ specific to requests made for Archival Object records.
 
 ### Accession Fields
 
-In addition to the fields specified above, the following additional fields are
-specific to requests made for Accession records.
+In addition to the fields specified in the list of common fields, the following
+additional fields are specific to requests made for Accession records.
 
 - `use_restrictions_note`
 - `access_restrictions_note`
 - `language`
     - This field is also present on most Archival Object requests, but it is 
       mapped from a different location for Accession requests. 
+- `accession_id`
+
+### Resource Fields
+
+In addition to the fields specified in the list of common fields, the following
+additional fields are specific to requests made for Resource records.
+
+- `repository_processing_note`
+- `collection_id`
+- `collection_title`
+- `ead_id`
+- `ead_location`
+- `finding_aid_title`
+- `finding_aid_subtitle`
+- `finding_aid_filing_title`
+- `finding_aid_date`
+- `finding_aid_author`
+- `finding_aid_description_rules`
+- `resource_finding_aid_description_rules`
+- `finding_aid_language`
+- `finding_aid_sponsor`
+- `finding_aid_edition_statement`
+- `finding_aid_series_statement`
+- `finding_aid_status`
+- `finding_aid_note`
 
 
 ## OpenURL Mappings
@@ -410,7 +531,7 @@ support other record types, specify the list of supported record type in
 configuration like this:
 
 ```ruby
-  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'other_record_type']
+  AppConfig[:aeon_fulfillment_record_types] = ['archival_object', 'accession', 'custom_record_type']
 ```
 
 It is possible to override the default mappers by providing a custom mapper class.

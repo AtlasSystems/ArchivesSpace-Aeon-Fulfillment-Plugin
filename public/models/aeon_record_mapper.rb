@@ -23,7 +23,7 @@ class AeonRecordMapper
         if @@mappers.has_key?(record.class)
             @@mappers[record.class].new(record)
         else
-            Rails.logger.info("Aeon Fulfillment Plugin -- This ArchivesSpace object type (#{record.class}) is not supported by this plugin.")
+            Rails.logger.info("Aeon Fulfillment Plugin") { "This ArchivesSpace object type (#{record.class}) is not supported by this plugin." }
             raise
         end
     end
@@ -57,15 +57,59 @@ class AeonRecordMapper
         false
     end
 
+    # Determines if the :requestable_archival_record_levels setting is present
+    # and exlcudes the 'level' property of the current record. This method is
+    # not used by this class, because not all implementations of "abstract_archival_object"
+    # have a "level" property that uses the "archival_record_level" enumeration.
+    def requestable_based_on_archival_record_level?
+
+        req_levels = self.repo_settings[:requestable_archival_record_levels]
+        if req_levels
+            is_whitelist = false
+            levels = []
+
+            # Determine if the list is a whitelist or a blacklist of levels.
+            # If the setting is just an array, assume that the list is a
+            # whitelist.
+            if req_levels.is_a?(Array)
+                is_whitelist = true
+                levels = req_levels
+            else
+                list_type = req_levels[:list_type]
+                is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
+                levels = req_levels[:values] || req_levels[:levels] || []
+            end
+
+            list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
+
+            Rails.logger.debug("Aeon Fulfillment Plugin") { ":requestable_archival_record_levels is a #{list_type_description}" }
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Record Level #{list_type_description}: #{levels}" }
+
+            # Determine the level of the current record.
+            level = ''
+            if self.record.json
+                level = self.record.json['level'] || ''
+            end
+
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Record's Level: \"#{level}\"" }
+
+            # If whitelist, check to see if the list of levels contains the level.
+            # Otherwise, check to make sure the level is not in the list.
+            return is_whitelist ? levels.include?(level) : !levels.include?(level)
+        end
+
+        true
+    end
+
     # If #show_action? returns false, then the button is shown disabled
     def show_action?
         begin
-            puts "Aeon Fulfillment Plugin -- Checking for plugin settings for the repository"
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for plugin settings for the repository" }
 
             if !self.repo_settings
-                puts "Aeon Fulfillment Plugin -- Could not find plugin settings for the repository: \"#{self.repo_code}\"."
+                Rails.logger.info("Aeon Fulfillment Plugin") { "Could not find plugin settings for the repository: \"#{self.repo_code}\"." }
             else
-                puts "Aeon Fulfillment Plugin -- Checking for top containers"
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for top containers" }
 
                 has_top_container = record.is_a?(Container) || self.container_instances.any?
 
@@ -75,16 +119,16 @@ class AeonRecordMapper
                 # then don't require containers
                 only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
 
-                puts "Aeon Fulfillment Plugin -- Containers found?    #{has_top_container}"
-                puts "Aeon Fulfillment Plugin -- only_top_containers? #{only_top_containers}"
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "Containers found?    #{has_top_container}" }
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "only_top_containers? #{only_top_containers}" }
 
                 return (has_top_container || !only_top_containers)
             end
 
         rescue Exception => e
-            puts "Aeon Fulfillment Plugin -- Failed to create Aeon Request action."
-            puts e.message
-            puts e.backtrace.inspect
+            Rails.logger.error("Aeon Fulfillment Plugin") { "Failed to create Aeon Request action." }
+            Rails.logger.error(e.message)
+            Rails.logger.error(e.backtrace.inspect)
 
         end
 
@@ -355,5 +399,5 @@ class AeonRecordMapper
         []
     end
 
-    protected :json_fields, :record_fields, :system_information, :find_container_instances
+    protected :json_fields, :record_fields, :system_information, :requestable_based_on_archival_record_level?, :find_container_instances
 end

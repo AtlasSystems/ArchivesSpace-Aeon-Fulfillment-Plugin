@@ -6,6 +6,17 @@ class AeonAccessionMapper < AeonRecordMapper
         super(accession)
     end
 
+    def json_fields
+        mappings = super
+
+        accession_identifier = [ json['id_0'], json['id_1'], json['id_2'], json['id_3'] ]
+        mappings['accession_id'] = accession_identifier
+            .reject {|id_comp| id_comp.blank?}
+            .join('-')
+
+        mappings
+    end
+
     # Returns a hash that maps from Aeon OpenURL values to values in the provided record.
     def record_fields
         mappings = super

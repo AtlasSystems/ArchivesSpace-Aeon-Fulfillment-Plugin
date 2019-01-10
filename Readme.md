@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20180726
+**Version:** 20190110
 
-**Last Updated:** January 4, 2019
+**Last Updated:** January 10, 2019
 
 
 ## Table of Contents
@@ -126,7 +126,14 @@ ArchivesSpace may cause changes in the functionality of this plugin.
           container.
 - **20180726**
     - Fixed a bug with imported instance data.
-
+- **20190110**
+    - Added support for requesting Resource records.
+    - Added the `:requestable_archival_record_levels` setting
+    - Added functionality to pull instance information from records that exist
+      higher in the resource tree, if the current record does not have any top
+      container instance information.
+    - Added hover text to the "Aeon Request" button when it is disabled. This
+      text is accessible through screen readers.
 
 ## Configuring Plugin Settings
 

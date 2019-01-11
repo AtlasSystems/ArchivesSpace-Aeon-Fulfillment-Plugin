@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20190110
+**Version:** 20190111
 
-**Last Updated:** January 10, 2019
+**Last Updated:** January 11, 2019
 
 
 ## Table of Contents
@@ -135,6 +135,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added hover text to the "Aeon Request" button when it is disabled. This
       text is accessible through screen readers.
     - Changed log statements to use the default Rails logger
+- **20190111**
+    - HTML tags are now being removed from all of the mapped values
 
 ## Configuring Plugin Settings
 

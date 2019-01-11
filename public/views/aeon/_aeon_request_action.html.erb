@@ -12,11 +12,11 @@ mapper = AeonRecordMapper.mapper_for(record)
         <% if name.casecmp('requests').zero? %>
           <% value.each do |request| %>
             <% request.each do |request_param, request_value| %>
-              <input type='hidden' name='<%= request_param %>' value='<%= request_value %>' />
+              <input type='hidden' name='<%= request_param %>' value='<%= strip_tags(request_value.to_s) %>' />
             <% end %>
           <% end %>
         <% else %>
-          <input type='hidden' name='<%= name %>' value='<%= value %>' />
+          <input type='hidden' name='<%= name %>' value='<%= strip_tags(value.to_s) %>' />
         <% end %>
       <% end %>
 

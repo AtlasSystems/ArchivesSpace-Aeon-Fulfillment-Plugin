@@ -136,7 +136,7 @@ ArchivesSpace may cause changes in the functionality of this plugin.
       text is accessible through screen readers.
     - Changed log statements to use the default Rails logger
 - **20190111**
-    - HTML tags are now being removed from all of the mapped values
+    - The plugin now removes all HTML tags from form values
 
 ## Configuring Plugin Settings
 

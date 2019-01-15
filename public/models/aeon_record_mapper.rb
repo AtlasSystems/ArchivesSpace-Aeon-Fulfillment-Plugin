@@ -36,16 +36,59 @@ class AeonRecordMapper
         AppConfig[:aeon_fulfillment][self.repo_code]
     end
 
+    def user_defined_fields
+        mappings = {}
+
+        if (udf_setting = self.repo_settings[:user_defined_fields])
+            if (user_defined_fields = (self.record['json'] || {})['user_defined'])
+            
+                # Determine if the list is a whitelist or a blacklist of fields.
+                # If the setting is just an array, assume that the list is a
+                # whitelist.
+                if udf_setting == true
+                    # If the setting is set to "true", then all fields should be
+                    # pulled in. This is implemented as a blacklist that contains
+                    # 0 values.
+                    is_whitelist = false
+                    fields = []
+
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { "Pulling in all user defined fields" }
+                else
+                    if udf_setting.is_a?(Array)
+                        is_whitelist = true
+                        fields = udf_setting
+                    else
+                        list_type = udf_setting[:list_type]
+                        is_whitelist = (list_type == :whitelist) || (list_type == 'whitelist')
+                        fields = udf_setting[:values] || udf_setting[:fields] || []
+                    end
+
+                    list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { ":allow_user_defined_fields is a #{list_type_description}" }
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { "User Defined Field #{list_type_description}: #{fields}" }
+                end
+
+                user_defined_fields.each do |field_name, value|
+                    if (is_whitelist ? fields.include?(field_name) : fields.exclude?(field_name))
+                        mappings["user_defined_#{field_name}"] = value
+                    end
+                end
+            end
+        end
+
+        mappings
+    end
+
     # This method tests whether the button should be hidden. This determination is based
     # on the settings for the repository and defaults to false.
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
 
-        return true if self.repo_settings.fetch(:hide_request_button, false)
-        return true if self.repo_settings.fetch(:hide_button_for_accessions, false) && record.is_a?(Accession)
+        return true if self.repo_settings[:hide_request_button]
+        return true if self.repo_settings[:hide_button_for_accessions] && record.is_a?(Accession)
 
-        if (types = self.repo_settings.fetch(:hide_button_for_access_restriction_types, false))
+        if (types = self.repo_settings[:hide_button_for_access_restriction_types])
           notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
                                               .map {|n| n['rights_restriction']['local_access_restriction_type']}
                                               .flatten.uniq
@@ -62,9 +105,7 @@ class AeonRecordMapper
     # not used by this class, because not all implementations of "abstract_archival_object"
     # have a "level" property that uses the "archival_record_level" enumeration.
     def requestable_based_on_archival_record_level?
-
-        req_levels = self.repo_settings[:requestable_archival_record_levels]
-        if req_levels
+        if (req_levels = self.repo_settings[:requestable_archival_record_levels])
             is_whitelist = false
             levels = []
 
@@ -81,7 +122,6 @@ class AeonRecordMapper
             end
 
             list_type_description = is_whitelist ? 'Whitelist' : 'Blacklist'
-
             Rails.logger.debug("Aeon Fulfillment Plugin") { ":requestable_archival_record_levels is a #{list_type_description}" }
             Rails.logger.debug("Aeon Fulfillment Plugin") { "Record Level #{list_type_description}: #{levels}" }
 
@@ -95,7 +135,7 @@ class AeonRecordMapper
 
             # If whitelist, check to see if the list of levels contains the level.
             # Otherwise, check to make sure the level is not in the list.
-            return is_whitelist ? levels.include?(level) : !levels.include?(level)
+            return is_whitelist ? levels.include?(level) : levels.exclude?(level)
         end
 
         true
@@ -144,6 +184,7 @@ class AeonRecordMapper
             .merge(self.system_information)
             .merge(self.json_fields)
             .merge(self.record_fields)
+            .merge(self.user_defined_fields)
 
         return mappings
     end
@@ -249,9 +290,7 @@ class AeonRecordMapper
         mappings = {}
 
         json = self.record.json
-        if !json
-            return mappings
-        end
+        return mappings unless json
 
         mappings['language'] = json['language']
 
@@ -278,9 +317,7 @@ class AeonRecordMapper
         mappings['display_string'] = json['display_string']
 
         instances = self.container_instances
-        if !instances
-            return mappings
-        end
+        return mappings unless instances
 
         mappings['requests'] = instances
             .each_with_index
@@ -355,7 +392,7 @@ class AeonRecordMapper
                 request
             }
 
-        return mappings
+        mappings
     end
 
     # Grabs a list of instances from the given jsonmodel, ignoring any digital object
@@ -399,5 +436,7 @@ class AeonRecordMapper
         []
     end
 
-    protected :json_fields, :record_fields, :system_information, :requestable_based_on_archival_record_level?, :find_container_instances
+    protected :json_fields, :record_fields, :system_information,
+              :requestable_based_on_archival_record_level?,
+              :find_container_instances, :user_defined_fields
 end

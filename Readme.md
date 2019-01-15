@@ -23,6 +23,7 @@
          8. [`:aeon_site_code`](#aeonsitecode)
          9. [`:hide_button_for_access_restriction_types`](#hidebuttonforaccessrestrictiontypes)
          10. [`:requestable_archival_record_levels`](#requestablearchivalrecordlevels)
+         11. [`:user_defined_fields`](#userdefinedfields)
       2. [Other Configuration Options](#other-configuration-options)
          1. [`:aeon_fulfillment_record_types`](#aeonfulfillmentrecordtypes)
          2. [`:aeon_fulfillment_button_position`](#aeonfulfillmentbuttonposition)
@@ -33,6 +34,7 @@
       2. [Archival Object Fields](#archival-object-fields)
       3. [Accession Fields](#accession-fields)
       4. [Resource Fields](#resource-fields)
+      5. [User Defined Fields](#user-defined-fields)
    7. [OpenURL Mappings](#openurl-mappings)
    8. [Custom Mappers](#custom-mappers)
    9. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
@@ -254,7 +256,7 @@ By default, no restriction types are hidden.
 
 #### `:requestable_archival_record_levels`
 
-This setting allows sites to restrict thy types of Resources and Archival
+This setting allows sites to restrict the types of Resources and Archival
 Objects that are requestable, using the "level" property of the record. 
 
 - The setting accepts a few different configurations, specifying either a
@@ -309,6 +311,85 @@ AppConfig[:aeon_fulfillment] = {
         :requestable_archival_record_levels => {
             :list_type => :blacklist,
             :values => ["collection", "series", "subseries", "recordgrp", "subgrp"]
+        }
+    }
+}
+```
+
+#### `:user_defined_fields`
+
+This setting allows sites to specify which user defined fields are imported.
+This setting applies to all records that use user defined fields. By default, no
+user defined fields are pulled from the record into the HTML form. Any fields
+that are imported will be labelled according to [the section on user defined fields below](#user-defined-fields).
+The setting accepts a few different configurations:
+
+- You can specify the setting as either `true` or `false`, indicating that all
+  or none of the fields should be mapped into the HTML form. `false` is the
+  default for this setting.
+- You can specify the setting as either a "whitelist" or a "blacklist" of user
+  defined fields that should or should not be mapped.
+- The values that are specified in this list MUST be the names of the fields as
+  they appear in the database and in the
+  [user defined schema](https://github.com/archivesspace/archivesspace/blob/757f2d738d6aa74bcd219d0667d109b7bb9bb99b/common/schemas/user_defined.rb).
+  The localizations/translations for these fields CANNOT be used.
+
+**Example 1:** Specifies that all fields from the User Defined Fields should be
+mapped into the HTML form. If `false` is used in place of true, none of the
+fields will be imported. `false` is the default value.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :user_defined_fields => true
+    }
+}
+```
+
+**Example 2:** Specifies a whitelist, variation 1. Under this configuration,
+only the 3 user defined fields that are listed will be imported into the HTML
+form.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :user_defined_fields => ["text_1", "string_1", "real_2"]
+    }
+}
+```
+
+**Example 3:** Specifies a whitelist, variation 2. This configuration is
+identical to **Example 2**.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :user_defined_fields => {
+            :list_type => :whitelist,
+            :values => ["text_1", "string_1", "real_2"]
+        }
+    }
+}
+```
+
+**Example 4:** Specifies a blacklist. Under this configuration, all of the user
+defined fields that are not specified in this list will be imported, except for
+the ones that are listed.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :user_defined_fields => {
+            :list_type => :blacklist,
+            :values => [
+                "text_1", "text_2", "text_3",
+                "string_1", "string_2",
+                "boolean_1", "boolean_2", "boolean_3"
+            ]
         }
     }
 }
@@ -503,6 +584,41 @@ additional fields are specific to requests made for Resource records.
 - `finding_aid_series_statement`
 - `finding_aid_status`
 - `finding_aid_note`
+
+
+### User Defined Fields
+
+You can use the [`:user_defined_fields`](#userdefinedfields) setting
+to configure which user defined fields are imported. These fields are imported
+with the `"user_defined_"` prepended to the name of the field. Below shows the
+formatting of all of the user defined fields, as they would exist in the HTML
+form.
+
+- `user_defined_boolean_1`
+- `user_defined_boolean_2`
+- `user_defined_boolean_3`
+- `user_defined_integer_1`
+- `user_defined_integer_2`
+- `user_defined_integer_3`
+- `user_defined_real_1`
+- `user_defined_real_2`
+- `user_defined_real_3`
+- `user_defined_string_1`
+- `user_defined_string_2`
+- `user_defined_string_3`
+- `user_defined_string_4`
+- `user_defined_text_1`
+- `user_defined_text_2`
+- `user_defined_text_3`
+- `user_defined_text_4`
+- `user_defined_text_5`
+- `user_defined_date_1`
+- `user_defined_date_2`
+- `user_defined_date_3`
+- `user_defined_enum_1`
+- `user_defined_enum_2`
+- `user_defined_enum_3`
+- `user_defined_enum_4`
 
 
 ## OpenURL Mappings

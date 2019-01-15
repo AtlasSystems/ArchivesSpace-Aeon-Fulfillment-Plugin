@@ -139,6 +139,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Changed log statements to use the default Rails logger
 - **20190111**
     - The plugin now removes all HTML tags from form values
+- **20190115**
+    - Added the `:user_defined_fields` setting
 
 ## Configuring Plugin Settings
 

@@ -19,9 +19,7 @@ class AeonResourceMapper < AeonRecordMapper
         mappings = super
 
         json = self.record.json
-        if !json
-            return mappings
-        end
+        return mappings unless json
 
         if json['repository_processing_note'] && json['repository_processing_note'].present?
             mappings['repository_processing_note'] = json['repository_processing_note']

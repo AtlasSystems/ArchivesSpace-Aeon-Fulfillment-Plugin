@@ -186,7 +186,7 @@ class AeonRecordMapper
             .merge(self.record_fields)
             .merge(self.user_defined_fields)
 
-        return mappings
+        mappings
     end
 
 
@@ -228,6 +228,8 @@ class AeonRecordMapper
     # Pulls data from self.record
     def record_fields
         mappings = {}
+
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record: #{self.record}" }
 
         mappings['identifier'] = self.record.identifier || self.record['identifier']
         mappings['publish'] = self.record['publish']
@@ -279,7 +281,7 @@ class AeonRecordMapper
         json = self.record.json
         return mappings unless json
 
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "json: #{json}" }
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record JSON: #{json}" }
 
         mappings['language'] = json['language']
 

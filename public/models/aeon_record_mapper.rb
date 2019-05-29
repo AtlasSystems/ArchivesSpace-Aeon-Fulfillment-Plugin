@@ -221,7 +221,7 @@ class AeonRecordMapper
 
         mappings['Site'] = self.repo_settings[:aeon_site_code] if self.repo_settings.has_key?(:aeon_site_code)
 
-        return mappings
+        mappings
     end
 
 
@@ -267,20 +267,7 @@ class AeonRecordMapper
                 .join("; ")
         end
 
-        if record.notes
-            accessrestrict = record.notes['accessrestrict']
-            if accessrestrict
-                arSubnotes = accessrestrict['subnotes']
-                if arSubnotes
-                    mappings['accessrestrict'] = arSubnotes
-                        .select { |arSubnote| arSubnote['content'].present? }
-                        .map { |arSubnote| arSubnote['content'].strip }
-                        .join("; ")
-                end
-            end
-        end
-
-        return mappings
+        mappings
     end
 
 
@@ -292,14 +279,26 @@ class AeonRecordMapper
         json = self.record.json
         return mappings unless json
 
+        Rails.logger.debug("Aeon Fulfillment Plugin") { "json: #{json}" }
+
         mappings['language'] = json['language']
 
-        if json['notes']
-            json['notes'].each do |note|
-                if note['type'] == 'physloc' and !note['content'].blank?
-                    mappings['physical_location_note'] = note['content'].map { |cont| "#{cont}" }.join("; ")
-                end
-            end
+        notes = json['notes']
+        if notes
+            mappings['physical_location_note'] = notes
+                .select { |note| note['type'] == 'physloc' and note['content'].present? }
+                .map { |note| note['content'] }
+                .flatten
+                .join("; ")
+            
+            mappings['accessrestrict'] = notes
+                .select { |note| note['type'] == 'accessrestrict' and note['subnotes'] }
+                .map { |note| note['subnotes'] }
+                .flatten
+                .select { |subnote| subnote['content'].present? }
+                .map { |subnote| subnote['content'] }
+                .flatten
+                .join("; ")
         end
 
         if json['dates']

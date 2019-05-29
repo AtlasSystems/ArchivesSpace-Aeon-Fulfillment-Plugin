@@ -34,6 +34,6 @@ class AeonAccessionMapper < AeonRecordMapper
 
         mappings['language'] = self.record['language']
 
-        return mappings
+        mappings
     end
 end

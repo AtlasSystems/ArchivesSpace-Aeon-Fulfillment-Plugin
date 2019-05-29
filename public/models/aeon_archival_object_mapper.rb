@@ -12,7 +12,7 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         return self.requestable_based_on_archival_record_level?
     end
 
-    # Override for AeonRecordMapper json_fields method. 
+    # Override for AeonRecordMapper json_fields method.
     def json_fields
         mappings = super
 

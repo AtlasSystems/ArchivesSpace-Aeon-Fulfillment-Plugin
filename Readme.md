@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20190115
+**Version:** 20190529
 
-**Last Updated:** January 15, 2019
+**Last Updated:** May 29, 2019
 
 
 ## Table of Contents
@@ -141,7 +141,9 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - The plugin now removes all HTML tags from form values
 - **20190115**
     - Added the `:user_defined_fields` setting
-
+- **20190529**
+    - Bug fixes for compatibility with ArchivesSpace v2.6.0 RC1
+        
 ## Configuring Plugin Settings
 
 In order to configure this plugin, you will need to modify the

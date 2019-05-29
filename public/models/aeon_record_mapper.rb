@@ -10,7 +10,7 @@ class AeonRecordMapper
         @record = record
         @container_instances = find_container_instances(record['json'] || {})
     end
-    
+
     def archivesspace
         ArchivesSpaceClient.instance
     end
@@ -41,7 +41,7 @@ class AeonRecordMapper
 
         if (udf_setting = self.repo_settings[:user_defined_fields])
             if (user_defined_fields = (self.record['json'] || {})['user_defined'])
-            
+
                 # Determine if the list is a whitelist or a blacklist of fields.
                 # If the setting is just an array, assume that the list is a
                 # whitelist.
@@ -193,7 +193,7 @@ class AeonRecordMapper
     # Pulls data from AppConfig and ASpace System
     def system_information
         mappings = {}
-        
+
         mappings['SystemID'] =
             if (!self.repo_settings[:aeon_external_system_id].blank?)
                 self.repo_settings[:aeon_external_system_id]
@@ -251,7 +251,7 @@ class AeonRecordMapper
                 mappings['collection_id'] = collection_id_components
                     .reject {|id_comp| id_comp.blank?}
                     .join('-')
-                    
+
                 mappings['collection_title'] = resource_obj[0]['title']
             end
         end
@@ -292,7 +292,7 @@ class AeonRecordMapper
                 .map { |note| note['content'] }
                 .flatten
                 .join("; ")
-            
+
             mappings['accessrestrict'] = notes
                 .select { |note| note['type'] == 'accessrestrict' and note['subnotes'] }
                 .map { |note| note['subnotes'] }
@@ -403,7 +403,7 @@ class AeonRecordMapper
     def find_container_instances (record_json)
 
         current_uri = record_json['uri']
-        
+
         Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
         Rails.logger.debug("Aeon Fulfillment Plugin") { "#{record_json.to_json}" }
 
@@ -424,14 +424,14 @@ class AeonRecordMapper
             parent_uri = record_json['resource']['ref']
             parent_uri = record_json['resource'] unless parent_uri.present?
         end
-        
+
         if parent_uri.present?
             Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
             parent = archivesspace.get_record(parent_uri)
             parent_json = parent['json']
             return find_container_instances(parent_json)
         end
-        
+
         Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found." }
 
         []

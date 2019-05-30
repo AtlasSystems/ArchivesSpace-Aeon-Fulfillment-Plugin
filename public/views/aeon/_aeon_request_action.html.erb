@@ -31,7 +31,7 @@ mapper = AeonRecordMapper.mapper_for(record)
 
     <div id="disabled-button-wrapper" tabindex="0" rel="tooltip" data-placement="bottom" title="<%= t('plugins.aeon_fulfillment.requesting_disabled') %>">
       <button id="disabled-aeon-fulfillment-request" class="btn btn-default page_action request" disabled="true" aria-disabled="true">
-        <i class="fa fa-external-link fa-3x"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
+        <i class="<%= t('plugins.aeon_fulfillment.request_button_icon') %>"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
         <span class="visually-hidden"><%= t('plugins.aeon_fulfillment.requesting_disabled') %></span>
       </button>
     </div>
@@ -40,6 +40,6 @@ mapper = AeonRecordMapper.mapper_for(record)
 
 <% end %>
 
-<% 
+<%
   Rails.logger.info("Aeon Fulfillment Plugin") { "Finished initializing plugin." }
 %>

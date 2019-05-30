@@ -12,7 +12,7 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         return self.requestable_based_on_archival_record_level?
     end
 
-    # Override for AeonRecordMapper json_fields method. 
+    # Override for AeonRecordMapper json_fields method.
     def json_fields
         mappings = super
 
@@ -25,7 +25,7 @@ class AeonArchivalObjectMapper < AeonRecordMapper
             mappings['repository_processing_note'] = json['repository_processing_note']
         end
 
-        return mappings
+        mappings
     end
 
     # Returns a hash that maps from Aeon OpenURL values to values in the provided record.
@@ -34,6 +34,6 @@ class AeonArchivalObjectMapper < AeonRecordMapper
 
         mappings['component_id'] = self.record['component_id']
 
-        return mappings
+        mappings
     end
 end

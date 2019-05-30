@@ -1,6 +1,6 @@
 en:
   plugins:
     aeon_fulfillment:
-      request_button_icon: fa fa-external-link fa-3x
+      request_button_icon: fa fa-external-link fa-external-link-alt fa-3x
       request_button_label: Aeon Request
       requesting_disabled: Requesting is not available for this record.

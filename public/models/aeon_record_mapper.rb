@@ -362,7 +362,6 @@ class AeonRecordMapper
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
-
                 collection = top_container_resolved['collection']
                 if collection
                     request["instance_top_container_collection_identifier_#{instance_count}"] = collection
@@ -389,6 +388,40 @@ class AeonRecordMapper
                         .join("; ")
 
                 end
+
+                container_locations = top_container_resolved["container_locations"]
+                return request unless container_locations && container_locations.any?
+
+                container_locations.each_with_index { |container_location, container_loc_number|
+                    container_loc_number = container_loc_number + 1
+                    
+                    request["instance_container_location_#{container_loc_number}_status_#{instance_count}"] = container_location['status']
+                    request["instance_container_location_#{container_loc_number}_start_date_#{instance_count}"] = container_location['start_date']
+                    request["instance_container_location_#{container_loc_number}_end_date_#{instance_count}"] = container_location['end_date']
+                    request["instance_container_location_#{container_loc_number}_note_#{instance_count}"] = container_location['note']
+                    request["instance_container_location_#{container_loc_number}_ref_#{instance_count}"] = container_location['ref']
+
+                    # TODO: This does not work, there is no resolved container location from
+                    # what I can tell. This needs to be fetched with a call to the backend.
+                    resolved_container_location = container_location["_resolved"]
+                    if resolved_container_location
+                        request["instance_container_location_#{container_loc_number}_uri_#{instance_count}"] = resolved_container_location['uri']
+                        request["instance_container_location_#{container_loc_number}_title_#{instance_count}"] = resolved_container_location['title']
+                        request["instance_container_location_#{container_loc_number}_building_#{instance_count}"] = resolved_container_location['building']
+                        request["instance_container_location_#{container_loc_number}_floor_#{instance_count}"] = resolved_container_location['floor']
+                        request["instance_container_location_#{container_loc_number}_room_#{instance_count}"] = resolved_container_location['room']
+                        request["instance_container_location_#{container_loc_number}_area_#{instance_count}"] = resolved_container_location['area']
+                        request["instance_container_location_#{container_loc_number}_barcode_#{instance_count}"] = resolved_container_location['barcode']
+                        request["instance_container_location_#{container_loc_number}_classification_#{instance_count}"] = resolved_container_location['classification']
+                        request["instance_container_location_#{container_loc_number}_coordinate_1_label_#{instance_count}"] = resolved_container_location['coordinate_1_label']
+                        request["instance_container_location_#{container_loc_number}_coordinate_1_indicator_#{instance_count}"] = resolved_container_location['coordinate_1_indicator']
+                        request["instance_container_location_#{container_loc_number}_coordinate_2_label_#{instance_count}"] = resolved_container_location['coordinate_2_label']
+                        request["instance_container_location_#{container_loc_number}_coordinate_2_indicator_#{instance_count}"] = resolved_container_location['coordinate_2_indicator']
+                        request["instance_container_location_#{container_loc_number}_coordinate_3_label_#{instance_count}"] = resolved_container_location['coordinate_3_label']
+                        request["instance_container_location_#{container_loc_number}_coordinate_3_indicator_#{instance_count}"] = resolved_container_location['coordinate_3_indicator']
+                        request["instance_container_location_#{container_loc_number}_temporary_#{instance_count}"] = resolved_container_location['temporary']
+                    end
+                }
 
                 request
             }

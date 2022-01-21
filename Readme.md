@@ -200,7 +200,6 @@ the end of the block of settings for the repository is reached, and also after
 the closing curly brace for each repository until the last repository is reached:
 
 ```ruby
-AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {
     "atlas" => {
         :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
@@ -440,7 +439,7 @@ left of the built in buttons.
 ### Example Configuration
 
 ```ruby
-AppConfig[:plugins] << "aeon_fulfillment"
+AppConfig[:plugins] = ['local', 'aeon_fulfillment']
 
 AppConfig[:aeon_fulfillment_record_types] = ['accession', 'archival_object', 'resource']
 AppConfig[:aeon_fulfillment_button_position] = 2

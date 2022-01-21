@@ -146,32 +146,46 @@ ArchivesSpace may cause changes in the functionality of this plugin.
         
 ## Configuring Plugin Settings
 
-In order to configure this plugin, you will need to modify the
-`config/config.rb` file of your ArchivesSpace installation. To enable the
-plugin, you will need to add the following to the configuration file.
+***Please note that the Aeon OpenURLMapping table must be configured in the Customization Manager 
+before the plugin can be used and/or tested with ArchivesSpace. See the [OpenURL Mappings](#openurl-mappings) section 
+for more information.*** 
+
+***If you are using the Atlas Dual Auth Portal to handle remote authentication in Aeon, please ensure 
+that it is configured to support POST data handling. See the [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations) 
+section for more information.***
+
+In order to configure this plugin, you will need to modify the 
+`config/config.rb` file of your ArchivesSpace installation. To enable the plugin,  
+you will need to reference it in the plugin configuration option in this file. 
+Please note that after enabling the plugin in the config.rb file, the ArchivesSpace 
+service will need to be restarted to push the plugin to the ArchivesSpace interface.
+In the following example, a reference to the `'aeon-fulfillment'` plugin has 
+been added to the list of enabled plugins after the reference to the default `'local'` plugin:
 
 ```ruby
-AppConfig[:plugins] << 'aeon_fulfillment'
-AppConfig[:aeon_fulfillment] = {}
+AppConfig[:plugins] = ['local', 'aeon_fulfillment']
 ```
 
-Next, you will need to add the appropriate settings appropriate values for 
-each repository that will use the plugin. In the sample below, replace 
+Next, you will need to add the appropriate settings and values for 
+each repository that will use the plugin. These settings should be placed directly under 
+the line of code listing your enabled plugins shown above. In the sample below, replace 
 `{repo_code}` with the repository code for each repository. The repo_code is 
-also known as the repository's short name. The repo_code must be written using 
-lower-case. 
+also known as the repository's short name. **The repo_code must be written using 
+lower-case.** Please also ensure that the `:aeon_return_link_label` setting 
+is included directly below the `:aeon_web_url`.
 
 ```ruby
+AppConfig[:aeon_fulfillment] = {}
 AppConfig[:aeon_fulfillment]['{repo_code}'] = {}
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_web_url] = "{Your aeon web url}"
 AppConfig[:aeon_fulfillment]['{repo_code}'][:aeon_return_link_label] = "{The text for the return link from Aeon}"
 ```
 
 For example, to configure the plugin for a repository that has the short name 
-"ATLAS", add the following to `config.rb`. 
+"ATLAS", add the following to `config.rb`. **Note: The `:aeon_site_code` setting should be 
+removed if you are not assigning multiple repositories to separate Aeon site codes**
 
 ```ruby
-AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {}
 AppConfig[:aeon_fulfillment]['atlas'] = {}
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_web_url] = "https://your.institution.edu/aeon/aeon.dll"
@@ -179,20 +193,24 @@ AppConfig[:aeon_fulfillment]['atlas'][:aeon_return_link_label] = "ArchivesSpace"
 AppConfig[:aeon_fulfillment]['atlas'][:aeon_site_code] = "AEON"
 ```
 
-This plugin configuration can also be formatted using the implicit form of a 
-Ruby hash. 
+If preferred, this plugin configuration can also be formatted using the implicit form of a 
+Ruby hash, with settings for each repository grouped within curly braces and 
+separated one per line. A comma should follow each individual line until 
+the end of the block of settings for the repository is reached, and also after 
+the closing curly brace for each repository until the last repository is reached:
 
 ```ruby
 AppConfig[:plugins] << 'aeon_fulfillment'
 AppConfig[:aeon_fulfillment] = {
     "atlas" => {
         :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
+        :aeon_return_link_label => "ArchivesSpace",
         :aeon_external_system_id => "ArchivesSpace"
     },
     "test-repo" => {
         :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
-        :aeon_site_code => "TEST",
-        :aeon_external_system_id => "ArchivesSpace Test Tepo"
+        :aeon_return_link_label => "ArchivesSpace",
+        :aeon_external_system_id => "ArchivesSpace Test Repo"
     }
 }
 ```
@@ -454,7 +472,13 @@ data rather than GET parameters so that data does not get truncated. This can be
 for some remote authentication systems. If you are using the Atlas Dual Auth Portal, it 
 already has functionality to resolve this issue by persisting POST data during the remote 
 authentication process so you can simply configure this plugin to send requests to it 
-instead of directly to Aeon. If you are not using the Atlas Dual Auth Portal with your 
+instead of directly to Aeon. However, please note that some additional configuration 
+is required to enable POST data support for the Dual Auth Portal. If you use the Portal and 
+are experiencing issues with POST data persistence between ArchivesSpace and Aeon, please 
+see the [Using an Authentication Portal Landing Page](https://support.atlas-sys.com/hc/en-us/articles/360011821074#h_01FSYP1NVPGY3JGKTWPM9T3K7Q) 
+page for information on configuring the Portal to support POST data. 
+
+If you are not using the Atlas Dual Auth Portal with your 
 remote authentication configuration or are having difficulty getting it configured 
 correctly, please contact Atlas Support.
 
@@ -639,9 +663,11 @@ Below is a list of recommended Open URL mappings that should be set in Aeon.
    `<#replacement-tag>` that has a name that matches one of the field names
    from the [Imported Fields](#imported-fields) section.
 
-For more information on configuring Aeon for this system, please visit the 
-[Submitting Requests via OpenURL](https://prometheus.atlas-sys.com/display/aeon/Submitting+Requests+via+OpenURL)
-page of our documentation at https://prometheus.atlas-sys.com.
+The SQL script below can be used to add some basic mappings to the OpenURLMapping table in Aeon. 
+Additional mappings can then be added manually to the table in the Aeon Customization Manager. 
+For more information on configuring this feature Aeon, please visit the 
+[Submitting Requests via OpenURL](https://support.atlas-sys.com/hc/en-us/articles/360011919573-Submitting-Requests-via-OpenURL)
+page of our documentation.
 
 ```sql
 INSERT INTO OpenURLMapping (URL_Ver, rfr_id, AeonAction, AeonFieldName, OpenURLFieldValues, AeonValue) VALUES ('Default', 'ArchivesSpace', 'Replace', 'ItemAuthor', '<#creators>', 'NULL');

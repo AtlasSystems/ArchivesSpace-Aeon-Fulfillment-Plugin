@@ -11,8 +11,10 @@ class AeonRecordMapper
         @container_instances = find_container_instances(record['json'] || {})
     end
 
+    ExtendedRequestClient.init
+
     def archivesspace
-        ArchivesSpaceClient.instance
+        ExtendedRequestClient.instance
     end
 
     def self.register_for_record_type(type)
@@ -89,9 +91,9 @@ class AeonRecordMapper
         return true if self.repo_settings[:hide_button_for_accessions] && record.is_a?(Accession)
 
         if (types = self.repo_settings[:hide_button_for_access_restriction_types])
-          notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
-                                              .map {|n| n['rights_restriction']['local_access_restriction_type']}
-                                              .flatten.uniq
+            notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
+                                                .map {|n| n['rights_restriction']['local_access_restriction_type']}
+                                                .flatten.uniq
 
           # hide if the record notes have any of the restriction types listed in config
           return true if (notes - types).length < notes.length
@@ -101,7 +103,7 @@ class AeonRecordMapper
     end
 
     # Determines if the :requestable_archival_record_levels setting is present
-    # and exlcudes the 'level' property of the current record. This method is
+    # and excludes the 'level' property of the current record. This method is
     # not used by this class, because not all implementations of "abstract_archival_object"
     # have a "level" property that uses the "archival_record_level" enumeration.
     def requestable_based_on_archival_record_level?
@@ -149,15 +151,17 @@ class AeonRecordMapper
             if !self.repo_settings
                 Rails.logger.info("Aeon Fulfillment Plugin") { "Could not find plugin settings for the repository: \"#{self.repo_code}\"." }
             else
+                # If this is an accession, and we're hiding the request button for thise, then we should always return false
+                if (record.is_a?(Accession) && self.repo_settings.fetch(:hide_button_for_accessions, false))
+                    Rails.logger.debug("Aeon Fulfillment Plugin") { "Hiding button for accession." }
+                    return false
+                end
+
                 Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for top containers" }
 
                 has_top_container = record.is_a?(Container) || self.container_instances.any?
 
-                only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
-
-                # if we're showing the button for accessions, and this is an accession,
-                # then don't require containers
-                only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
+                only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || self.repo_settings[:top_container_mode] || false
 
                 Rails.logger.debug("Aeon Fulfillment Plugin") { "Containers found?    #{has_top_container}" }
                 Rails.logger.debug("Aeon Fulfillment Plugin") { "only_top_containers? #{only_top_containers}" }
@@ -362,6 +366,12 @@ class AeonRecordMapper
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
+                locations = top_container_resolved["container_locations"]
+                if locations.any?
+                    location_id = locations.sort_by { |l| l["start_date"]}.last()["ref"]
+                    location = archivesspace.get_location(location_id)
+                    request["instance_top_container_location"] = location["title"]
+                end
 
                 collection = top_container_resolved['collection']
                 if collection
@@ -401,7 +411,7 @@ class AeonRecordMapper
     # method will recurse up the record's resource tree, until it finds a record that does
     # have top container instances, and will pull the list of instances from there.
     def find_container_instances (record_json)
-
+        
         current_uri = record_json['uri']
 
         Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
@@ -415,21 +425,25 @@ class AeonRecordMapper
             return instances
         end
 
-        parent_uri = ''
+        # If we're in top container mode, we can skip this step, 
+        # since we only want to present containers associated with the current record.
+        if (!self.repo_settings[:top_container_mode])
+            parent_uri = ''
 
-        if record_json['parent'].present?
-            parent_uri = record_json['parent']['ref']
-            parent_uri = record_json['parent'] unless parent_uri.present?
-        elsif record_json['resource'].present?
-            parent_uri = record_json['resource']['ref']
-            parent_uri = record_json['resource'] unless parent_uri.present?
-        end
+            if record_json['parent'].present?
+                parent_uri = record_json['parent']['ref']
+                parent_uri = record_json['parent'] unless parent_uri.present?
+            elsif record_json['resource'].present?
+                parent_uri = record_json['resource']['ref']
+                parent_uri = record_json['resource'] unless parent_uri.present?
+            end
 
-        if parent_uri.present?
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
-            parent = archivesspace.get_record(parent_uri)
-            parent_json = parent['json']
-            return find_container_instances(parent_json)
+            if parent_uri.present?
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
+                parent = archivesspace.get_record(parent_uri)
+                parent_json = parent['json']
+                return find_container_instances(parent_json)
+            end
         end
 
         Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found." }

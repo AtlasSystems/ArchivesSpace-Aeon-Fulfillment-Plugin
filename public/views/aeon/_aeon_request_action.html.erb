@@ -4,12 +4,17 @@ Rails.logger.info("Aeon Fulfillment Plugin") { "Initializing Plugin..." }
 mapper = AeonRecordMapper.mapper_for(record)
 %>
 
+
+<!-- ASPACE PUI RECORD MODEL (for Valerie - remove before release)
+  <%= raw(JSON.pretty_generate(record.to_json)) %>
+END OF PUI RECORD MODEL -->
+
 <%= javascript_include_tag "#{@base_url}/assets/js/aeon_request_action.js" %>
 
 <% unless mapper.hide_button? %>
 
   <% if mapper.show_action? %>
-    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?action=11&type=200", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
+    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?#{mapper.repo_settings.fetch(:top_container_mode, false) ? "action=10&form=35" : "action=11&type=200"}", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
       <% mapper.map.each do |name, value| %>
         <% if name.casecmp('requests').zero? %>
           <% value.each do |request| %>

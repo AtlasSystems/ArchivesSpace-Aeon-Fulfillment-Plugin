@@ -273,6 +273,34 @@ class AeonRecordMapper
                 .join("; ")
         end
 
+        resolved_top_container = self.record.resolved_top_container
+        mappings['userestrict']  = ''
+        if (resolved_top_container)
+            resolved_top_container['active_restrictions'].each do |ar|
+                if (ar['linked_records']['_resolved'])
+                    userestrict = ar['linked_records']['_resolved']['notes']
+                                        .select { |note| note['type'] == 'userestrict' and note['subnotes'] }
+                                        .map { |note| note['subnotes'] }.flatten
+                                        .select { |subnote| subnote['content'].present? }
+                                        .map { |subnote| subnote['content'] }.flatten
+                                        .join("; ")
+                    mappings['userestrict'] = userestrict
+                end
+                # TODO remove once Valerie confirms it's not needed
+                # ar['linked_records']
+                #     .select{ |lr| lr['_resolved'] }
+                #     .each do |lr|
+                #         userestrict = lr['_resolved']['notes']
+                #                         .select { |note| note['type'] == 'userestrict' and note['subnotes'] }
+                #                         .map { |note| note['subnotes'] }.flatten
+                #                         .select { |subnote| subnote['content'].present? }
+                #                         .map { |subnote| subnote['content'] }.flatten
+                #                         .join("; ")
+                # end
+            end
+        end
+        #resolved_top_container.active_restrictions[*].linked_records[*]._resolved.notes[type=userestrict].subnotes[*].content
+       
         mappings
     end
 
@@ -318,6 +346,15 @@ class AeonRecordMapper
                 }
         end
 
+        if json['rights_statements']
+            mappings['rights_type'] = json['rights_statements'].map{ |r| r['rights_type']}.uniq.join(',')
+        end
+
+        digital_instances = json['instances'].select { |instance| instance['instance_type'] == 'digital_object'}
+        if (digital_instances.any?)
+            mappings["digital_objects"] = digital_instances.map{|d| d['digital_object']['ref']}.join(';')
+        end
+
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
@@ -328,7 +365,7 @@ class AeonRecordMapper
             .each_with_index
             .map { |instance, i|
                 request = {}
-
+                
                 instance_count = i + 1
 
                 request['Request'] = "#{instance_count}"
@@ -366,11 +403,18 @@ class AeonRecordMapper
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
+                request["requestable_#{instance_count}"] = (top_container_resolved['active_restrictions'] || [])
+                    .select{ |ar| ar['local_access_restriction_type'] }
+                    .flatten.uniq
+                    .select{ |ar| (self.repo_settings[:hide_button_for_access_restriction_types] || []).include?(ar)}
+                    .empty?
+
                 locations = top_container_resolved["container_locations"]
                 if locations.any?
                     location_id = locations.sort_by { |l| l["start_date"]}.last()["ref"]
                     location = archivesspace.get_location(location_id)
-                    request["instance_top_container_location"] = location["title"]
+                    request["instance_top_container_location_#{instance_count}"] = location["title"]
+                    request["instance_top_container_location_id_#{instance_count}"] = location_id
                 end
 
                 collection = top_container_resolved['collection']

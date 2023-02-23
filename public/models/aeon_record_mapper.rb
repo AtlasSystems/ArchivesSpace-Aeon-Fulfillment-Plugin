@@ -81,25 +81,88 @@ class AeonRecordMapper
         mappings
     end
 
+    def unrequestable_display_message
+        if !self.requestable_based_on_archival_record_level?
+            if (message = self.repo_settings[:disallowed_record_level_message])
+                return message
+            else
+                return "Records of this type cannot be requested."
+            end
+        elsif !self.record_has_top_containers?
+            if (message = self.repo_settings[:no_containers_message])
+                return message
+            else
+                return "No requestable containers are associated with this record."
+            end
+        elsif self.record_has_restrictions?
+            if (message = self.repo_settings[:restrictions_message])
+                return message
+            else
+                return "Restrictions prevent access to this material."
+            end
+        end
+        return ""
+    end
+    
     # This method tests whether the button should be hidden. This determination is based
     # on the settings for the repository and defaults to false.
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
 
-        return true if self.repo_settings[:hide_request_button]
-        return true if self.repo_settings[:hide_button_for_accessions] && record.is_a?(Accession)
+        if self.repo_settings[:hide_request_button]
+            return true
+        elsif (self.repo_settings[:hide_button_for_accessions] == true && record.is_a?(Accession))
+            return true
+        elsif self.requestable_based_on_archival_record_level? == false
+            return true
+        elsif self.record_has_top_containers? == false
+            return true
+        elsif self.record_has_restrictions? == true
+            return true
+        end
+        return false
+    end
 
+    def record_has_top_containers?
+        return record.is_a?(Container) || self.container_instances.any?
+    end
+
+    def record_has_restrictions?
         if (types = self.repo_settings[:hide_button_for_access_restriction_types])
             notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
                                                 .map {|n| n['rights_restriction']['local_access_restriction_type']}
                                                 .flatten.uniq
 
-          # hide if the record notes have any of the restriction types listed in config
-          return true if (notes - types).length < notes.length
+            # hide if the record notes have any of the restriction types listed in config
+            access_restrictions = true if (notes - types).length < notes.length
+
+            # check each top container for restrictions
+            # if all of them are unrequestable, we should hide the request button for this record
+            has_requestable_container = false
+            if (instances = self.container_instances)
+                instances.each do |instance|
+                    if (container = instance['sub_container'])
+                        if (top_container = container['top_container'])
+                            if (top_container_resolved = top_container['_resolved'])
+                                tc_has_restrictions = (top_container_resolved['active_restrictions'] || [])
+                                    .map{ |ar| ar['local_access_restriction_type'] }
+                                    .flatten.uniq
+                                    .select{ |ar| types.include?(ar)}
+                                    .any?
+                                if tc_has_restrictions == false
+                                    has_requestable_container = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            return access_restrictions || !has_requestable_container
         end
 
-        false
+        return false
     end
 
     # Determines if the :requestable_archival_record_levels setting is present
@@ -141,42 +204,6 @@ class AeonRecordMapper
         end
 
         true
-    end
-
-    # If #show_action? returns false, then the button is shown disabled
-    def show_action?
-        begin
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for plugin settings for the repository" }
-
-            if !self.repo_settings
-                Rails.logger.info("Aeon Fulfillment Plugin") { "Could not find plugin settings for the repository: \"#{self.repo_code}\"." }
-            else
-                # If this is an accession, and we're hiding the request button for thise, then we should always return false
-                if (record.is_a?(Accession) && self.repo_settings.fetch(:hide_button_for_accessions, false))
-                    Rails.logger.debug("Aeon Fulfillment Plugin") { "Hiding button for accession." }
-                    return false
-                end
-
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for top containers" }
-
-                has_top_container = record.is_a?(Container) || self.container_instances.any?
-
-                only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || self.repo_settings[:top_container_mode] || false
-
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "Containers found?    #{has_top_container}" }
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "only_top_containers? #{only_top_containers}" }
-
-                return (has_top_container || !only_top_containers)
-            end
-
-        rescue Exception => e
-            Rails.logger.error("Aeon Fulfillment Plugin") { "Failed to create Aeon Request action." }
-            Rails.logger.error(e.message)
-            Rails.logger.error(e.backtrace.inspect)
-
-        end
-
-        false
     end
 
 
@@ -286,20 +313,8 @@ class AeonRecordMapper
                                         .join("; ")
                     mappings['userestrict'] = userestrict
                 end
-                # TODO remove once Valerie confirms it's not needed
-                # ar['linked_records']
-                #     .select{ |lr| lr['_resolved'] }
-                #     .each do |lr|
-                #         userestrict = lr['_resolved']['notes']
-                #                         .select { |note| note['type'] == 'userestrict' and note['subnotes'] }
-                #                         .map { |note| note['subnotes'] }.flatten
-                #                         .select { |subnote| subnote['content'].present? }
-                #                         .map { |subnote| subnote['content'] }.flatten
-                #                         .join("; ")
-                # end
             end
         end
-        #resolved_top_container.active_restrictions[*].linked_records[*]._resolved.notes[type=userestrict].subnotes[*].content
        
         mappings
     end
@@ -402,9 +417,9 @@ class AeonRecordMapper
                 request["instance_top_container_barcode_#{instance_count}"] = top_container_resolved['barcode']
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
-
+   
                 request["requestable_#{instance_count}"] = (top_container_resolved['active_restrictions'] || [])
-                    .select{ |ar| ar['local_access_restriction_type'] }
+                    .map{ |ar| ar['local_access_restriction_type'] }
                     .flatten.uniq
                     .select{ |ar| (self.repo_settings[:hide_button_for_access_restriction_types] || []).include?(ar)}
                     .empty?

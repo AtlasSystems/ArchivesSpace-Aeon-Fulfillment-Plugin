@@ -86,19 +86,19 @@ class AeonRecordMapper
             if (message = self.repo_settings[:disallowed_record_level_message])
                 return message
             else
-                return "Records of this type cannot be requested."
+                return "Not requestable"
             end
         elsif !self.record_has_top_containers?
             if (message = self.repo_settings[:no_containers_message])
                 return message
             else
-                return "No requestable containers are associated with this record."
+                return "No requestable containers"
             end
         elsif self.record_has_restrictions?
             if (message = self.repo_settings[:restrictions_message])
                 return message
             else
-                return "Restrictions prevent access to this material."
+                return "Access restricted"
             end
         end
         return ""

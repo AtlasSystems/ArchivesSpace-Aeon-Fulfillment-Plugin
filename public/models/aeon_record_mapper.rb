@@ -293,27 +293,26 @@ class AeonRecordMapper
             mappings['repo_name'] = resolved_repository['name']
         end
 
-        if record['creators']
+        if self.record['creators']
             mappings['creators'] = self.record['creators']
                 .select { |cr| cr.present? }
                 .map { |cr| cr.strip }
                 .join("; ")
         end
 
-        resolved_top_container = self.record.resolved_top_container
-        mappings['userestrict']  = ''
-        if (resolved_top_container)
-            resolved_top_container['active_restrictions'].each do |ar|
-                if (ar['linked_records']['_resolved'])
-                    userestrict = ar['linked_records']['_resolved']['notes']
-                                        .select { |note| note['type'] == 'userestrict' and note['subnotes'] }
-                                        .map { |note| note['subnotes'] }.flatten
-                                        .select { |subnote| subnote['content'].present? }
-                                        .map { |subnote| subnote['content'] }.flatten
-                                        .join("; ")
-                    mappings['userestrict'] = userestrict
-                end
-            end
+        if self.record.dates
+            mappings['date_expression'] = self.record.dates
+                                              .select{ |date| date['date_type'] == 'single' or date['date_type'] == 'inclusive'}
+                                              .map{ |date| date['final_expression'] }
+                                              .join(';')
+        end
+
+        if (self.record.notes['userestrict'])
+            mappings['userestrict'] = self.record.notes['userestrict']
+                .map { |note| note['subnotes'] }.flatten
+                .select { |subnote| subnote['content'].present? and subnote['publish'] == true }
+                .map { |subnote| subnote['content'] }.flatten
+                .join("; ") 
         end
        
         mappings
@@ -335,7 +334,7 @@ class AeonRecordMapper
         notes = json['notes']
         if notes
             mappings['physical_location_note'] = notes
-                .select { |note| note['type'] == 'physloc' and note['content'].present? }
+                .select { |note| note['type'] == 'physloc' and note['content'].present? and note['publish'] == true }
                 .map { |note| note['content'] }
                 .flatten
                 .join("; ")
@@ -344,21 +343,19 @@ class AeonRecordMapper
                 .select { |note| note['type'] == 'accessrestrict' and note['subnotes'] }
                 .map { |note| note['subnotes'] }
                 .flatten
-                .select { |subnote| subnote['content'].present? }
+                .select { |subnote| subnote['content'].present? and subnote['publish'] == true}
                 .map { |subnote| subnote['content'] }
                 .flatten
                 .join("; ")
         end
 
-        if json['dates']
-            json['dates']
-                .select { |date| date['expression'].present? }
-                .group_by { |date| date['label'] }
-                .each { |label, dates|
-                    mappings["#{label}_date"] = dates
-                        .map { |date| date['expression'] }
-                        .join("; ")
-                }
+        if json['linked_agents']
+            mappings['creators'] = json['linked_agents']
+                .select { |l| l['role'] == 'creator' and l['_resolved'] }
+                .map { |l| l['_resolved']['names'] }.flatten
+                .select { |n| n['is_display_name'] == true}
+                .map { |n| n['sort_name']}
+                .join("; ")
         end
 
         if json['rights_statements']
@@ -428,8 +425,9 @@ class AeonRecordMapper
                 if locations.any?
                     location_id = locations.sort_by { |l| l["start_date"]}.last()["ref"]
                     location = archivesspace.get_location(location_id)
-                    request["instance_top_container_location_#{instance_count}"] = location["title"]
+                    request["instance_top_container_location_#{instance_count}"] = location['title']
                     request["instance_top_container_location_id_#{instance_count}"] = location_id
+                    request["instance_top_container_location_building_#{instance_count}"] = location['building']
                 end
 
                 collection = top_container_resolved['collection']

@@ -414,7 +414,11 @@ class AeonRecordMapper
                 request["instance_top_container_barcode_#{instance_count}"] = top_container_resolved['barcode']
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
-   
+
+                if (top_container_resolved['container_locations'])
+                    request["instance_top_container_location_note_#{instance_count}"] = top_container_resolved['container_locations'].map{ |l| l['note']}.join{';'}
+                end
+
                 request["requestable_#{instance_count}"] = (top_container_resolved['active_restrictions'] || [])
                     .map{ |ar| ar['local_access_restriction_type'] }
                     .flatten.uniq

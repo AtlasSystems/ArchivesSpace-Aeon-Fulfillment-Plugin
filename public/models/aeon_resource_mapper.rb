@@ -41,6 +41,7 @@ class AeonResourceMapper < AeonRecordMapper
         mappings['finding_aid_series_statement'] = json['finding_aid_series_statement']
         mappings['finding_aid_status'] = json['finding_aid_status']
         mappings['finding_aid_note'] = json['finding_aid_note']
+        mappings['restrictions_apply'] = json['restrictions']
 
         mappings
     end

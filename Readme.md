@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20190529
+**Version:** 20230302
 
-**Last Updated:** May 29, 2019
+**Last Updated:** March 2, 2023
 
 
 ## Table of Contents
@@ -147,6 +147,9 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added the `:user_defined_fields` setting
 - **20190529**
     - Bug fixes for compatibility with ArchivesSpace v2.6.0 RC1
+- **20230302**
+    - Added `:top_container_mode` setting to support new Aeon Archival Request form.
+    - Added some additional mapping options.
         
 ## Configuring Plugin Settings
 

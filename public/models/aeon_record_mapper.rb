@@ -349,6 +349,18 @@ class AeonRecordMapper
                 .join("; ")
         end
 
+        if json['dates']
+            json['dates']
+                .select { |date| date['expression'].present? }
+                .group_by { |date| date['label'] }
+                .each { |label, dates|
+                    mappings["#{label}_date"] = dates
+                        .map { |date| date['expression'] }
+                        .join("; ")
+                }
+        end
+
+
         if json['linked_agents']
             mappings['creators'] = json['linked_agents']
                 .select { |l| l['role'] == 'creator' and l['_resolved'] }
@@ -359,7 +371,7 @@ class AeonRecordMapper
         end
 
         if json['rights_statements']
-            mappings['rights_type'] = json['rights_statements'].map{ |r| r['rights_type']}.uniq.join(',')
+            mappings['rights_type'] = json['rights_statements'].map{ |r| r['rights_type']}.uniq.join(';')
         end
 
         digital_instances = json['instances'].select { |instance| instance['instance_type'] == 'digital_object'}

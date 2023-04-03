@@ -11,7 +11,8 @@
    1. [Table of Contents](#table-of-contents)
    2. [Overview](#overview)
    3. [Changelog](#changelog)
-   4. [Configuring Plugin Settings](#configuring-plugin-settings)
+   4. [Requirements](#requirements)
+   5. [Configuring Plugin Settings](#configuring-plugin-settings)
       1. [Per Repository Configuration Options](#per-repository-configuration-options)
          1. [`:aeon_web_url`](#aeonweburl)
          2. [`:aeon_return_link_label`](#aeonreturnlinklabel)
@@ -32,16 +33,16 @@
          1. [`:aeon_fulfillment_record_types`](#aeonfulfillmentrecordtypes)
          2. [`:aeon_fulfillment_button_position`](#aeonfulfillmentbuttonposition)
       3. [Example Configuration](#example-configuration)
-   5. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
-   6. [Imported Fields](#imported-fields)
+   6. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
+   7. [Imported Fields](#imported-fields)
       1. [Common Fields](#common-fields)
       2. [Archival Object Fields](#archival-object-fields)
       3. [Accession Fields](#accession-fields)
       4. [Resource Fields](#resource-fields)
       5. [User Defined Fields](#user-defined-fields)
-   7. [OpenURL Mappings](#openurl-mappings)
-   8. [Custom Mappers](#custom-mappers)
-   9. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
+   8. [OpenURL Mappings](#openurl-mappings)
+   9. [Custom Mappers](#custom-mappers)
+   10. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
 
 
 ## Overview
@@ -62,7 +63,7 @@ options for the built in PUI requesting functionality, it is also possible to
 configure some repositories to continue using the built in PUI requesting
 feature for archival objects while allowing other repositories to use Aeon.
 
-This plugin has been tested on ArchivesSpace version 2.2.0. Future releases of
+This plugin has been tested on ArchivesSpace version 3.3.1, and requires Aeon Server version 5.2.0 or greater. Future releases of
 ArchivesSpace may cause changes in the functionality of this plugin.
 
 
@@ -150,7 +151,11 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 - **20230302**
     - Added `:top_container_mode` setting to support new Aeon Archival Request form.
     - Added some additional mapping options.
-        
+
+## Requirements
+
+
+
 ## Configuring Plugin Settings
 
 ***Please note that the Aeon OpenURLMapping table must be configured in the Customization Manager 

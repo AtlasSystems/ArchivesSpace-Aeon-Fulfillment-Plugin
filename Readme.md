@@ -154,7 +154,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 ## Requirements
 
-
+- Aeon Server 5.2.0 or greater
+- ArchivesSpace 3.3.1
 
 ## Configuring Plugin Settings
 

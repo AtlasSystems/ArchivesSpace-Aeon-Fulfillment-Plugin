@@ -6,11 +6,6 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         super(archival_object)
     end
 
-    # Override of #show_action? from AeonRecordMapper
-    def show_action?
-        return false if !super
-        return self.requestable_based_on_archival_record_level?
-    end
 
     # Override for AeonRecordMapper json_fields method.
     def json_fields
@@ -25,6 +20,8 @@ class AeonArchivalObjectMapper < AeonRecordMapper
             mappings['repository_processing_note'] = json['repository_processing_note']
         end
 
+        mappings['restrictions_apply'] = restrictions_apply?
+
         mappings
     end
 
@@ -35,5 +32,25 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         mappings['component_id'] = self.record['component_id']
 
         mappings
+    end
+
+    def restrictions_apply?
+
+        if self.record.json['restrictions_apply'] 
+            return true
+        end
+
+        self.record['ancestors'].each do |ancestor|
+            Rails.logger.info("Aeon Fulfillment Plugin") { "Logging ancestor #{ancestor}" }
+            ancestor_record = archivesspace.get_record(ancestor)
+            Rails.logger.info("Aeon Fulfillment Plugin") { ancestor_record.to_yaml }
+
+
+
+            if (ancestor_record.json['restrictions_apply'] == true or ancestor_record.json['restrictions'] == true)
+                return true
+            end
+        end
+        return false
     end
 end

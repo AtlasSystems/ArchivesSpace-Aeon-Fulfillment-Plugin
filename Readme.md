@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20190529
+**Version:** 20230302
 
-**Last Updated:** May 29, 2019
+**Last Updated:** March 2, 2023
 
 
 ## Table of Contents
@@ -11,7 +11,8 @@
    1. [Table of Contents](#table-of-contents)
    2. [Overview](#overview)
    3. [Changelog](#changelog)
-   4. [Configuring Plugin Settings](#configuring-plugin-settings)
+   4. [Requirements](#requirements)
+   5. [Configuring Plugin Settings](#configuring-plugin-settings)
       1. [Per Repository Configuration Options](#per-repository-configuration-options)
          1. [`:aeon_web_url`](#aeonweburl)
          2. [`:aeon_return_link_label`](#aeonreturnlinklabel)
@@ -23,21 +24,25 @@
          8. [`:aeon_site_code`](#aeonsitecode)
          9. [`:hide_button_for_access_restriction_types`](#hidebuttonforaccessrestrictiontypes)
          10. [`:requestable_archival_record_levels`](#requestablearchivalrecordlevels)
-         11. [`:user_defined_fields`](#userdefinedfields)
+         11. [`:top_container_mode`](#topcontainermode)
+         12. [`:disallowed_record_level_message`](#disallowedrecordlevelmessage)
+         13. [`:no_containers_message`](#nocontainersmessage)
+         14. [`:restrictions_message`](#restrictionsmessage)
+         15. [`:user_defined_fields`](#userdefinedfields)
       2. [Other Configuration Options](#other-configuration-options)
          1. [`:aeon_fulfillment_record_types`](#aeonfulfillmentrecordtypes)
          2. [`:aeon_fulfillment_button_position`](#aeonfulfillmentbuttonposition)
       3. [Example Configuration](#example-configuration)
-   5. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
-   6. [Imported Fields](#imported-fields)
+   6. [Aeon Remote Authentication Configurations](#aeon-remote-authentication-configurations)
+   7. [Imported Fields](#imported-fields)
       1. [Common Fields](#common-fields)
       2. [Archival Object Fields](#archival-object-fields)
       3. [Accession Fields](#accession-fields)
       4. [Resource Fields](#resource-fields)
       5. [User Defined Fields](#user-defined-fields)
-   7. [OpenURL Mappings](#openurl-mappings)
-   8. [Custom Mappers](#custom-mappers)
-   9. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
+   8. [OpenURL Mappings](#openurl-mappings)
+   9. [Custom Mappers](#custom-mappers)
+   10. [Configuring the Aeon Request Form Used](#configuring-the-aeon-request-form-used)
 
 
 ## Overview
@@ -58,7 +63,7 @@ options for the built in PUI requesting functionality, it is also possible to
 configure some repositories to continue using the built in PUI requesting
 feature for archival objects while allowing other repositories to use Aeon.
 
-This plugin has been tested on ArchivesSpace version 2.2.0. Future releases of
+This plugin has been tested on ArchivesSpace version 3.3.1, and requires Aeon Server version 5.2.0 or greater. Future releases of
 ArchivesSpace may cause changes in the functionality of this plugin.
 
 
@@ -143,7 +148,15 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added the `:user_defined_fields` setting
 - **20190529**
     - Bug fixes for compatibility with ArchivesSpace v2.6.0 RC1
-        
+- **20230302**
+    - Added `:top_container_mode` setting to support new Aeon Archival Request form.
+    - Added some additional mapping options.
+
+## Requirements
+
+- Aeon Server 5.2.0 or greater
+- ArchivesSpace 3.3.1
+
 ## Configuring Plugin Settings
 
 ***Please note that the Aeon OpenURLMapping table must be configured in the Customization Manager 
@@ -268,8 +281,8 @@ sent.
 #### `:hide_button_for_access_restriction_types`
 
 This setting allows the request button to be hidden for any records that have
-any of the listed local access restriction types. The value of this config item
-should be an array of restriction types, for example:
+any of the listed values in the local_access_restriction_type field of the rights_restriction 
+of the accessrestrict note. The value of this config item should be an array of restriction types, for example:
 
 `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']` 
 
@@ -336,6 +349,30 @@ AppConfig[:aeon_fulfillment] = {
     }
 }
 ```
+
+#### `:top_container_mode`
+
+This true/false setting controls whether or not the new top container mode is active for the given repository. This mode has two effects:
+
+- Only top containers associated with the current record are requestable. If no top containers are associated with the current record, then the request button will be replaced by a message (see :no_containers_message setting below).
+
+- When the user clicks the Aeon Request button, they will be taken to the new Aeon Box-Picker form to submit their request(s).
+
+If this setting is true, then the :requests_permitted_for_containers_only should also be set to true.
+
+#### `:disallowed_record_level_message`
+
+This is the message that will be displayed instead of the Aeon Request button if the current record cannot be requested due to the values listed in the :requestable_archival_record_levels setting. If no value is provided, the default value will be "Not requestable". The message should be kept short (30 characters or less) for best appearance.
+
+
+#### `:no_containers_message`
+
+This is the message that will be displayed instead of the Aeon Request button if the current record has no associated topcontainers and :top_container_mode is active. If no value is provided, the default value will be "No requestable containers". The message should be kept short (30 characters or less) for best appearance.
+
+#### `:restrictions_message`
+
+This is the message that will be displayed instead of the Aeon Request button if the current record cannot be requested because it has active restrictions matching the values in the :hide_button_for_access_restriction_types setting. If no value is provided, the default value will be "Access Restricted". The message should be kept short (30 characters or less) for best appearance.
+
 
 #### `:user_defined_fields`
 
@@ -535,6 +572,18 @@ records.
       of values that could appear in place of the `{date_label}` placeholder 
       is controlled by the `date_label` enumeration of your ArchivesSpace 
       installation. 
+- `date_expression`
+  - semi-colon (`;`) separated string list 
+  -  contains the combined final_expressions of the single and inclusive dates associated with the record.
+- `userestrict`
+  - semi-colon (`;`) separated string list 
+  - contains the combined contents of all published userestrict notes associated with the record.
+- `rights_type`
+  - semi-colon (`;`) separated string list 
+  - contains the combined rights_type values of all rights statements associated with the record.
+- `digital_objects`
+  - semi-colon (`;`) separated string list 
+  - contains the IDs of all digital objects associated with the record.
 
 The following fields are common to both Accession records and Archival Object
 records, but are based on the number of instances associated with the record.
@@ -567,6 +616,10 @@ and the values of each may differ from instance to instance.
 - `instance_top_container_collection_display_string` (semi-colon (`;`) separated string list)
 - `instance_top_container_series_identifer` (semi-colon (`;`) separated string list)
 - `instance_top_container_series_display_string` (semi-colon (`;`) separated string list)
+- `instance_top_container_location_note`
+- `instance_top_container_location_title`
+- `instance_top_container_location_id`
+- `instance_top_container_location_building`
 
 ### Archival Object Fields
 

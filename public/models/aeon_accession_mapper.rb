@@ -19,7 +19,6 @@ class AeonAccessionMapper < AeonRecordMapper
 
         language = json['language']
         if language
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping language JSON: #{language}" }
             mappings['language'] = language
         end
 

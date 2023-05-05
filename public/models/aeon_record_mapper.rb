@@ -327,12 +327,8 @@ class AeonRecordMapper
         json = self.record.json
         return mappings unless json
 
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record JSON: #{json}" }
-
         lang_materials = json['lang_materials']
         if lang_materials
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Language JSON: #{lang_materials}" }
-
             mappings['language'] = lang_materials
                                     .select { |lm| lm['language_and_script'].present? and lm['language_and_script']['language'].present?}
                                     .map{ |lm| lm['language_and_script']['language'] }
@@ -342,7 +338,6 @@ class AeonRecordMapper
 
         language = json['language']
         if language
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping language JSON: #{language}" }
             mappings['language'] = language
         end
 

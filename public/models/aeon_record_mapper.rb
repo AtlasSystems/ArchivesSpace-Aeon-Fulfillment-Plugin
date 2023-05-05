@@ -329,7 +329,23 @@ class AeonRecordMapper
 
         Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record JSON: #{json}" }
 
-        mappings['language'] = json['language']
+        lang_materials = json['lang_materials']
+        if lang_materials
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Language JSON: #{lang_materials}" }
+
+            mappings['language'] = lang_materials
+                                    .select { |lm| lm['language_and_script'].present? and lm['language_and_script']['language'].present?}
+                                    .map{ |lm| lm['language_and_script']['language'] }
+                                    .flatten
+                                    .join(";")
+        end
+
+        language = json['language']
+        if language
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping language JSON: #{language}" }
+            mappings['language'] = language
+        end
+
 
         notes = json['notes']
         if notes

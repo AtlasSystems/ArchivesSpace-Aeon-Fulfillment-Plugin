@@ -17,6 +17,12 @@ class AeonAccessionMapper < AeonRecordMapper
             .reject {|id_comp| id_comp.blank?}
             .join('-')
 
+        language = json['language']
+        if language
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping language JSON: #{language}" }
+            mappings['language'] = language
+        end
+
         mappings
     end
 
@@ -31,8 +37,6 @@ class AeonAccessionMapper < AeonRecordMapper
         if record.access_restrictions_note && record.access_restrictions_note.present?
             mappings['access_restrictions_note'] = record.access_restrictions_note
         end
-
-        mappings['language'] = self.record['language']
 
         mappings
     end

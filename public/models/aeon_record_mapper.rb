@@ -82,6 +82,10 @@ class AeonRecordMapper
     end
 
     def unrequestable_display_message
+        if !(self.repo_settings)
+            return "";
+        end
+
         if !self.requestable_based_on_archival_record_level?
             if (message = self.repo_settings[:disallowed_record_level_message])
                 return message
@@ -104,6 +108,10 @@ class AeonRecordMapper
         return ""
     end
     
+    def configured?
+        return true if self.repo_settings
+    end
+
     # This method tests whether the button should be hidden. This determination is based
     # on the settings for the repository and defaults to false.
     def hide_button?

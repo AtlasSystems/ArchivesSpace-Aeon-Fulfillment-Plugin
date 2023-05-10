@@ -550,6 +550,9 @@ records.
 - `repo_code`
 - `repo_name`
 - `language`
+    - semi-colon (`;`) separated string list
+    - contains the content from the `language` elements listed in `lang_materials`
+    - for accessions, contains the single value in the `language` element
 - `restrictions_apply` (true/false value)
 - `display_string`
 - `creators` 

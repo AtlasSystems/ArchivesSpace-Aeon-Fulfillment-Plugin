@@ -8,13 +8,6 @@ class AeonResourceMapper < AeonRecordMapper
         super(resource)
     end
 
-    # Override of #show_action? from AeonRecordMapper
-    def show_action?
-        return false if !super
-
-        self.requestable_based_on_archival_record_level?
-    end
-
     # Override for AeonRecordMapper json_fields method.
     def json_fields
         mappings = super
@@ -48,6 +41,7 @@ class AeonResourceMapper < AeonRecordMapper
         mappings['finding_aid_series_statement'] = json['finding_aid_series_statement']
         mappings['finding_aid_status'] = json['finding_aid_status']
         mappings['finding_aid_note'] = json['finding_aid_note']
+        mappings['restrictions_apply'] = json['restrictions']
 
         mappings
     end

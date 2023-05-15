@@ -4,12 +4,17 @@ Rails.logger.info("Aeon Fulfillment Plugin") { "Initializing Plugin..." }
 mapper = AeonRecordMapper.mapper_for(record)
 %>
 
-<%= javascript_include_tag "#{@base_url}/assets/js/aeon_request_action.js" %>
+<% if mapper.configured? %>
 
-<% unless mapper.hide_button? %>
+  <%= javascript_include_tag "#{@base_url}/assets/js/aeon_request_action.js" %>
 
-  <% if mapper.show_action? %>
-    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?action=11&type=200", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
+  <% if mapper.hide_button? %>
+    <div id="unrequestable-message-wrapper" class="alert alert-warning text-wrap" style="width: 245px; margin-bottom: 0; text-align: center;">
+      <%= mapper.unrequestable_display_message %>
+    </div>
+  <% else %>
+
+    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?#{mapper.repo_settings.fetch(:top_container_mode, false) ? "action=10&form=35" : "action=11&type=200"}", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
       <% mapper.map.each do |name, value| %>
         <% if name.casecmp('requests').zero? %>
           <% value.each do |request| %>
@@ -27,17 +32,11 @@ mapper = AeonRecordMapper.mapper_for(record)
       </button>
     <% end %>
 
-  <% else %>
-
-    <div id="disabled-button-wrapper" tabindex="0" rel="tooltip" data-placement="bottom" title="<%= t('plugins.aeon_fulfillment.requesting_disabled') %>">
-      <button id="disabled-aeon-fulfillment-request" class="btn btn-default page_action request" disabled="true" aria-disabled="true">
-        <i class="<%= t('plugins.aeon_fulfillment.request_button_icon') %>"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
-        <span class="visually-hidden"><%= t('plugins.aeon_fulfillment.requesting_disabled') %></span>
-      </button>
-    </div>
-
   <% end %>
-
+<% else %>
+<%
+  Rails.logger.info("Aeon Fulfillment Plugin") { "Plugin not configured." }
+%>
 <% end %>
 
 <%

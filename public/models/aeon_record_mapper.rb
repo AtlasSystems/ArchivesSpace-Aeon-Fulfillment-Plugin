@@ -11,8 +11,10 @@ class AeonRecordMapper
         @container_instances = find_container_instances(record['json'] || {})
     end
 
+    ExtendedRequestClient.init
+
     def archivesspace
-        ArchivesSpaceClient.instance
+        ExtendedRequestClient.instance
     end
 
     def self.register_for_record_type(type)
@@ -79,29 +81,100 @@ class AeonRecordMapper
         mappings
     end
 
+    def unrequestable_display_message
+        if !(self.repo_settings)
+            return "";
+        end
+
+        if !self.requestable_based_on_archival_record_level?
+            if (message = self.repo_settings[:disallowed_record_level_message])
+                return message
+            else
+                return "Not requestable"
+            end
+        elsif !self.record_has_top_containers?
+            if (message = self.repo_settings[:no_containers_message])
+                return message
+            else
+                return "No requestable containers"
+            end
+        elsif self.record_has_restrictions?
+            if (message = self.repo_settings[:restrictions_message])
+                return message
+            else
+                return "Access restricted"
+            end
+        end
+        return ""
+    end
+    
+    def configured?
+        return true if self.repo_settings
+    end
+
     # This method tests whether the button should be hidden. This determination is based
     # on the settings for the repository and defaults to false.
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
 
-        return true if self.repo_settings[:hide_request_button]
-        return true if self.repo_settings[:hide_button_for_accessions] && record.is_a?(Accession)
+        if self.repo_settings[:hide_request_button]
+            return true
+        elsif (self.repo_settings[:hide_button_for_accessions] == true && record.is_a?(Accession))
+            return true
+        elsif self.requestable_based_on_archival_record_level? == false
+            return true
+        elsif self.record_has_top_containers? == false
+            return true
+        elsif self.record_has_restrictions? == true
+            return true
+        end
+        return false
+    end
 
+    def record_has_top_containers?
+        return record.is_a?(Container) || self.container_instances.any?
+    end
+
+    def record_has_restrictions?
         if (types = self.repo_settings[:hide_button_for_access_restriction_types])
-          notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
-                                              .map {|n| n['rights_restriction']['local_access_restriction_type']}
-                                              .flatten.uniq
+            notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
+                                                .map {|n| n['rights_restriction']['local_access_restriction_type']}
+                                                .flatten.uniq
 
-          # hide if the record notes have any of the restriction types listed in config
-          return true if (notes - types).length < notes.length
+            # hide if the record notes have any of the restriction types listed in config
+            access_restrictions = true if (notes - types).length < notes.length
+
+            # check each top container for restrictions
+            # if all of them are unrequestable, we should hide the request button for this record
+            has_requestable_container = false
+            if (instances = self.container_instances)
+                instances.each do |instance|
+                    if (container = instance['sub_container'])
+                        if (top_container = container['top_container'])
+                            if (top_container_resolved = top_container['_resolved'])
+                                tc_has_restrictions = (top_container_resolved['active_restrictions'] || [])
+                                    .map{ |ar| ar['local_access_restriction_type'] }
+                                    .flatten.uniq
+                                    .select{ |ar| types.include?(ar)}
+                                    .any?
+                                if tc_has_restrictions == false
+                                    has_requestable_container = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            return access_restrictions || !has_requestable_container
         end
 
-        false
+        return false
     end
 
     # Determines if the :requestable_archival_record_levels setting is present
-    # and exlcudes the 'level' property of the current record. This method is
+    # and excludes the 'level' property of the current record. This method is
     # not used by this class, because not all implementations of "abstract_archival_object"
     # have a "level" property that uses the "archival_record_level" enumeration.
     def requestable_based_on_archival_record_level?
@@ -139,40 +212,6 @@ class AeonRecordMapper
         end
 
         true
-    end
-
-    # If #show_action? returns false, then the button is shown disabled
-    def show_action?
-        begin
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for plugin settings for the repository" }
-
-            if !self.repo_settings
-                Rails.logger.info("Aeon Fulfillment Plugin") { "Could not find plugin settings for the repository: \"#{self.repo_code}\"." }
-            else
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "Checking for top containers" }
-
-                has_top_container = record.is_a?(Container) || self.container_instances.any?
-
-                only_top_containers = self.repo_settings[:requests_permitted_for_containers_only] || false
-
-                # if we're showing the button for accessions, and this is an accession,
-                # then don't require containers
-                only_top_containers = self.repo_settings.fetch(:hide_button_for_accessions, false) if record.is_a?(Accession)
-
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "Containers found?    #{has_top_container}" }
-                Rails.logger.debug("Aeon Fulfillment Plugin") { "only_top_containers? #{only_top_containers}" }
-
-                return (has_top_container || !only_top_containers)
-            end
-
-        rescue Exception => e
-            Rails.logger.error("Aeon Fulfillment Plugin") { "Failed to create Aeon Request action." }
-            Rails.logger.error(e.message)
-            Rails.logger.error(e.backtrace.inspect)
-
-        end
-
-        false
     end
 
 
@@ -262,13 +301,28 @@ class AeonRecordMapper
             mappings['repo_name'] = resolved_repository['name']
         end
 
-        if record['creators']
+        if self.record['creators']
             mappings['creators'] = self.record['creators']
                 .select { |cr| cr.present? }
                 .map { |cr| cr.strip }
                 .join("; ")
         end
 
+        if self.record.dates
+            mappings['date_expression'] = self.record.dates
+                                              .select{ |date| date['date_type'] == 'single' or date['date_type'] == 'inclusive'}
+                                              .map{ |date| date['final_expression'] }
+                                              .join(';')
+        end
+
+        if (self.record.notes['userestrict'])
+            mappings['userestrict'] = self.record.notes['userestrict']
+                .map { |note| note['subnotes'] }.flatten
+                .select { |subnote| subnote['content'].present? and subnote['publish'] == true }
+                .map { |subnote| subnote['content'] }.flatten
+                .join("; ") 
+        end
+       
         mappings
     end
 
@@ -281,14 +335,25 @@ class AeonRecordMapper
         json = self.record.json
         return mappings unless json
 
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record JSON: #{json}" }
+        lang_materials = json['lang_materials']
+        if lang_materials
+            mappings['language'] = lang_materials
+                                    .select { |lm| lm['language_and_script'].present? and lm['language_and_script']['language'].present?}
+                                    .map{ |lm| lm['language_and_script']['language'] }
+                                    .flatten
+                                    .join(";")
+        end
 
-        mappings['language'] = json['language']
+        language = json['language']
+        if language
+            mappings['language'] = language
+        end
+
 
         notes = json['notes']
         if notes
             mappings['physical_location_note'] = notes
-                .select { |note| note['type'] == 'physloc' and note['content'].present? }
+                .select { |note| note['type'] == 'physloc' and note['content'].present? and note['publish'] == true }
                 .map { |note| note['content'] }
                 .flatten
                 .join("; ")
@@ -297,7 +362,7 @@ class AeonRecordMapper
                 .select { |note| note['type'] == 'accessrestrict' and note['subnotes'] }
                 .map { |note| note['subnotes'] }
                 .flatten
-                .select { |subnote| subnote['content'].present? }
+                .select { |subnote| subnote['content'].present? and subnote['publish'] == true}
                 .map { |subnote| subnote['content'] }
                 .flatten
                 .join("; ")
@@ -314,6 +379,25 @@ class AeonRecordMapper
                 }
         end
 
+
+        if json['linked_agents']
+            mappings['creators'] = json['linked_agents']
+                .select { |l| l['role'] == 'creator' and l['_resolved'] }
+                .map { |l| l['_resolved']['names'] }.flatten
+                .select { |n| n['is_display_name'] == true}
+                .map { |n| n['sort_name']}
+                .join("; ")
+        end
+
+        if json['rights_statements']
+            mappings['rights_type'] = json['rights_statements'].map{ |r| r['rights_type']}.uniq.join(';')
+        end
+
+        digital_instances = json['instances'].select { |instance| instance['instance_type'] == 'digital_object'}
+        if (digital_instances.any?)
+            mappings["digital_objects"] = digital_instances.map{|d| d['digital_object']['ref']}.join(';')
+        end
+
         mappings['restrictions_apply'] = json['restrictions_apply']
         mappings['display_string'] = json['display_string']
 
@@ -324,7 +408,7 @@ class AeonRecordMapper
             .each_with_index
             .map { |instance, i|
                 request = {}
-
+                
                 instance_count = i + 1
 
                 request['Request'] = "#{instance_count}"
@@ -362,6 +446,24 @@ class AeonRecordMapper
                 request["instance_top_container_type_#{instance_count}"] = top_container_resolved['type']
                 request["instance_top_container_uri_#{instance_count}"] = top_container_resolved['uri']
 
+                if (top_container_resolved['container_locations'])
+                    request["instance_top_container_location_note_#{instance_count}"] = top_container_resolved['container_locations'].map{ |l| l['note']}.join{';'}
+                end
+
+                request["requestable_#{instance_count}"] = (top_container_resolved['active_restrictions'] || [])
+                    .map{ |ar| ar['local_access_restriction_type'] }
+                    .flatten.uniq
+                    .select{ |ar| (self.repo_settings[:hide_button_for_access_restriction_types] || []).include?(ar)}
+                    .empty?
+
+                locations = top_container_resolved["container_locations"]
+                if locations.any?
+                    location_id = locations.sort_by { |l| l["start_date"]}.last()["ref"]
+                    location = archivesspace.get_location(location_id)
+                    request["instance_top_container_location_#{instance_count}"] = location['title']
+                    request["instance_top_container_location_id_#{instance_count}"] = location_id
+                    request["instance_top_container_location_building_#{instance_count}"] = location['building']
+                end
 
                 collection = top_container_resolved['collection']
                 if collection
@@ -401,7 +503,7 @@ class AeonRecordMapper
     # method will recurse up the record's resource tree, until it finds a record that does
     # have top container instances, and will pull the list of instances from there.
     def find_container_instances (record_json)
-
+        
         current_uri = record_json['uri']
 
         Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
@@ -415,21 +517,25 @@ class AeonRecordMapper
             return instances
         end
 
-        parent_uri = ''
+        # If we're in top container mode, we can skip this step, 
+        # since we only want to present containers associated with the current record.
+        if (!self.repo_settings[:top_container_mode])
+            parent_uri = ''
 
-        if record_json['parent'].present?
-            parent_uri = record_json['parent']['ref']
-            parent_uri = record_json['parent'] unless parent_uri.present?
-        elsif record_json['resource'].present?
-            parent_uri = record_json['resource']['ref']
-            parent_uri = record_json['resource'] unless parent_uri.present?
-        end
+            if record_json['parent'].present?
+                parent_uri = record_json['parent']['ref']
+                parent_uri = record_json['parent'] unless parent_uri.present?
+            elsif record_json['resource'].present?
+                parent_uri = record_json['resource']['ref']
+                parent_uri = record_json['resource'] unless parent_uri.present?
+            end
 
-        if parent_uri.present?
-            Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
-            parent = archivesspace.get_record(parent_uri)
-            parent_json = parent['json']
-            return find_container_instances(parent_json)
+            if parent_uri.present?
+                Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found. Checking parent. (#{parent_uri})" }
+                parent = archivesspace.get_record(parent_uri)
+                parent_json = parent['json']
+                return find_container_instances(parent_json)
+            end
         end
 
         Rails.logger.debug("Aeon Fulfillment Plugin") { "No Top Container instances found." }

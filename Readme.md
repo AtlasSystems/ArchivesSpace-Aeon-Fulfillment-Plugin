@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20230302
+**Version:** 20230725
 
-**Last Updated:** March 2, 2023
+**Last Updated:** July 25, 2023
 
 
 ## Table of Contents
@@ -151,6 +151,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 - **20230302**
     - Added `:top_container_mode` setting to support new Aeon Archival Request form.
     - Added some additional mapping options.
+- **20230725**
+    - Added `:log_records` setting to reduce amount of data logged unless logging of full records is explicitly enabled.
 
 ## Requirements
 
@@ -287,6 +289,11 @@ of the accessrestrict note. The value of this config item should be an array of 
 `:hide_button_for_access_restriction_types => ['RestrictedSpecColl']` 
 
 By default, no restriction types are hidden.
+
+#### `:log_records`
+
+This setting will log the full content of ArchivesSpace records when set to true.
+This can be useful for debugging mappings and plugin issues, but should not normally be enabled.
 
 #### `:requestable_archival_record_levels`
 

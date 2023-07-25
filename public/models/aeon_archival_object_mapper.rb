@@ -41,9 +41,12 @@ class AeonArchivalObjectMapper < AeonRecordMapper
         end
 
         self.record['ancestors'].each do |ancestor|
-            Rails.logger.info("Aeon Fulfillment Plugin") { "Logging ancestor #{ancestor}" }
+            
             ancestor_record = archivesspace.get_record(ancestor)
-            Rails.logger.info("Aeon Fulfillment Plugin") { ancestor_record.to_yaml }
+            if log_record?
+                Rails.logger.info("Aeon Fulfillment Plugin") { "Logging ancestor #{ancestor}" }
+                Rails.logger.info("Aeon Fulfillment Plugin") { ancestor_record.to_yaml }
+            end
 
 
 

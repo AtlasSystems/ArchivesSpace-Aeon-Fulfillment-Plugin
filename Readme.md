@@ -290,6 +290,11 @@ of the accessrestrict note. The value of this config item should be an array of 
 
 By default, no restriction types are hidden.
 
+#### `:log_records`
+
+This setting will log the full content of ArchivesSpace records when set to true.
+This can be useful for debugging mappings and plugin issues, but should not normally be enabled.
+
 #### `:requestable_archival_record_levels`
 
 This setting allows sites to restrict the types of Resources and Archival

@@ -214,6 +214,10 @@ class AeonRecordMapper
         true
     end
 
+    def log_record?
+        return self.repo_settings[:log_records] == true
+    end
+
 
     # Pulls data from the contained record
     def map
@@ -267,8 +271,9 @@ class AeonRecordMapper
     # Pulls data from self.record
     def record_fields
         mappings = {}
-
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record: #{self.record}" }
+        if log_record?
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "Mapping Record: #{self.record}" }
+        end
 
         mappings['identifier'] = self.record.identifier || self.record['identifier']
         mappings['publish'] = self.record['publish']
@@ -505,9 +510,11 @@ class AeonRecordMapper
     def find_container_instances (record_json)
         
         current_uri = record_json['uri']
-
+        
         Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
-        Rails.logger.debug("Aeon Fulfillment Plugin") { "#{record_json.to_json}" }
+        if log_record?
+            Rails.logger.debug("Aeon Fulfillment Plugin") { "#{record_json.to_json}" }
+        end
 
         instances = record_json['instances']
             .reject { |instance| instance['digital_object'] }

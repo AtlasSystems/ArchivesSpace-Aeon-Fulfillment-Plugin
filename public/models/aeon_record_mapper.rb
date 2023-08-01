@@ -35,7 +35,7 @@ class AeonRecordMapper
     end
 
     def repo_settings
-        AppConfig[:aeon_fulfillment][self.repo_code]
+        AppConfig[:aeon_fulfillment][self.repo_code] || {}
     end
 
     def user_defined_fields

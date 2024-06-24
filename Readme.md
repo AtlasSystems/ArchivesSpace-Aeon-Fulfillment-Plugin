@@ -552,8 +552,6 @@ records.
 - `level`
 - `title`
 - `uri`
-- `collection_id`
-- `collection_title`
 - `repo_code`
 - `repo_name`
 - `language`
@@ -564,12 +562,6 @@ records.
 - `display_string`
 - `creators` 
     - semi-colon (`;`) separated string list
-- `accessrestrict`
-    - semi-colon (`;`) separated string list
-    - contains the content from `accessrestrict` subnotes
-- `physical_location_note`
-    - semi-colon (`;`) separated string list 
-    - contains the content from `physloc` notes
 - `{date_label}_date`
     - semi-colon (`;`) separated string list 
     - contains the content from the `expression`s of the record's related 
@@ -585,9 +577,6 @@ records.
 - `date_expression`
   - semi-colon (`;`) separated string list 
   -  contains the combined final_expressions of the single and inclusive dates associated with the record.
-- `userestrict`
-  - semi-colon (`;`) separated string list 
-  - contains the combined contents of all published userestrict notes associated with the record.
 - `rights_type`
   - semi-colon (`;`) separated string list 
   - contains the combined rights_type values of all rights statements associated with the record.
@@ -636,8 +625,19 @@ and the values of each may differ from instance to instance.
 In addition to the fields specified above, the following additional fields are
 specific to requests made for Archival Object records.
 
-- `repository_processing_note`
+- `accessrestrict`
+    - semi-colon (`;`) separated string list
+    - contains the content from `accessrestrict` subnotes
+- `collection_id`
+- `collection_title`
 - `component_id`
+- `physical_location_note`
+    - semi-colon (`;`) separated string list 
+    - contains the content from `physloc` notes
+- `repository_processing_note`
+- `userestrict`
+  - semi-colon (`;`) separated string list 
+  - contains the combined contents of all published userestrict notes associated with the record.
 
 ### Accession Fields
 

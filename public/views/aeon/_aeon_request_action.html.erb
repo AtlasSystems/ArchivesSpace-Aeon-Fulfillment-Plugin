@@ -28,7 +28,8 @@ mapper = AeonRecordMapper.mapper_for(record)
       <% end %>
 
       <button type="submit" class="btn page_action request btn-default" title="<%= t('plugins.aeon_fulfillment.request_button_label') %>">
-        <i class="<%= t('plugins.aeon_fulfillment.request_button_icon') %>"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
+        <i class="<%= t('plugins.aeon_fulfillment.request_button_icon') %>" aria-hidden="true"></i><br/><%= t('plugins.aeon_fulfillment.request_button_label') %>
+        <% unless mapper.repo_settings.fetch(:request_in_new_tab, false) %><span class="visually-hidden">opens in new window</span><% end %>
       </button>
     <% end %>
 

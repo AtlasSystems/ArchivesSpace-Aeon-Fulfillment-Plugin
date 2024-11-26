@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20230725
+**Version:** 20241126
 
-**Last Updated:** July 25, 2023
+**Last Updated:** November 26, 2024
 
 
 ## Table of Contents
@@ -153,6 +153,10 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Added some additional mapping options.
 - **20230725**
     - Added `:log_records` setting to reduce amount of data logged unless logging of full records is explicitly enabled.
+- **20241126**
+    - Fixed a bug that caused a login loop when `:top_container_mode` is false. 
+    Rather than using action=11&type=200 in this case, the AeonForm is specified as 
+    ExternalRequest with a hidden input instead.
 
 ## Requirements
 

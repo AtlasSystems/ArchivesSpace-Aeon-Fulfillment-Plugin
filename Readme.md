@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20241126
+**Version:** 20241210
 
-**Last Updated:** November 26, 2024
+**Last Updated:** December 10, 2024
 
 
 ## Table of Contents
@@ -68,6 +68,11 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 
 ## Changelog
+
+- **20241210**
+    - Added example to demonstrate configuration of
+    :disallowed_record_level_message, :no_containers_message,
+    and :restrictions_message settings.
 
 - **20170809** 
     - Initial release of this ArchivesSpace plugin
@@ -384,6 +389,19 @@ This is the message that will be displayed instead of the Aeon Request button if
 
 This is the message that will be displayed instead of the Aeon Request button if the current record cannot be requested because it has active restrictions matching the values in the :hide_button_for_access_restriction_types setting. If no value is provided, the default value will be "Access Restricted". The message should be kept short (30 characters or less) for best appearance.
 
+**Example 1** Specifies messages for :disallowed_records_level_message, :no_containers_message, and :restrictions_message.
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        # ...
+        :top_container_mode => true,
+        :disallowed_record_level_message => "Not requestable",
+        :no_containers_message => "No requestable containers",
+        :restrictions_message => "Access restricted"
+    }
+}
+```
 
 #### `:user_defined_fields`
 

@@ -92,7 +92,7 @@ class AeonRecordMapper
             else
                 return "Not requestable"
             end
-        elsif !self.record_has_top_containers?
+        elsif !self.record_has_top_containers? && (self.repo_settings[:requests_permitted_for_containers_only] == true || self.repo_settings[:top_container_mode] == true)
             if (message = self.repo_settings[:no_containers_message])
                 return message
             else
@@ -117,14 +117,16 @@ class AeonRecordMapper
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
-
+        
         if self.repo_settings[:hide_request_button]
             return true
         elsif (self.repo_settings[:hide_button_for_accessions] == true && record.is_a?(Accession))
             return true
         elsif self.requestable_based_on_archival_record_level? == false
             return true
-        elsif self.record_has_top_containers? == false
+        elsif self.repo_settings[:top_container_mode] == true && self.record_has_top_containers? == false
+            return true
+        elsif self.repo_settings[:requests_permitted_for_containers_only] == true && self.record_has_top_containers? == false
             return true
         elsif self.record_has_restrictions? == true
             return true

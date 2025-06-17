@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20241210
+**Version:** 20250617
 
-**Last Updated:** December 10, 2024
+**Last Updated:** June 17, 2025
 
 
 ## Table of Contents
@@ -162,6 +162,8 @@ ArchivesSpace may cause changes in the functionality of this plugin.
     - Fixed a bug that caused a login loop when `:top_container_mode` is false. 
     Rather than using action=11&type=200 in this case, the AeonForm is specified as 
     ExternalRequest with a hidden input instead.
+- **20250617**
+    - Fixed a bug that prevented the plugin from correctly handling the `:requests_permitted_for_containers_only` setting when `:top_container_mode` is false.
 
 ## Requirements
 

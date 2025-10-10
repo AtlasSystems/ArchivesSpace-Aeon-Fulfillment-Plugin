@@ -92,7 +92,7 @@ class AeonRecordMapper
             else
                 return "Not requestable"
             end
-        elsif !self.record_has_top_containers? && (self.repo_settings[:requests_permitted_for_containers_only] == true || self.repo_settings[:top_container_mode] == true)
+        elsif !self.record_has_top_containers? && self.repo_settings[:requests_permitted_for_containers_only] == true
             if (message = self.repo_settings[:no_containers_message])
                 return message
             else
@@ -117,25 +117,57 @@ class AeonRecordMapper
     def hide_button?
         # returning false to maintain the original behavior
         return false unless self.repo_settings
-        
+
         if self.repo_settings[:hide_request_button]
             return true
         elsif (self.repo_settings[:hide_button_for_accessions] == true && record.is_a?(Accession))
             return true
         elsif self.requestable_based_on_archival_record_level? == false
             return true
-        elsif self.repo_settings[:top_container_mode] == true && self.record_has_top_containers? == false
-            return true
         elsif self.repo_settings[:requests_permitted_for_containers_only] == true && self.record_has_top_containers? == false
+            return true
+        elsif self.repo_settings[:top_container_mode] == true && self.record_has_top_containers? == false
             return true
         elsif self.record_has_restrictions? == true
             return true
         end
+
+        # In mixed mode, the button is never hidden based on container presence
         return false
     end
 
     def record_has_top_containers?
         return record.is_a?(Container) || self.container_instances.any?
+    end
+
+    # Returns the effective mode for this specific record
+    # :top_container, :generic, or :mixed (only if explicitly set to mixed)
+    def effective_request_mode
+        mode = self.repo_settings.fetch(:top_container_mode, false)
+
+        # If explicitly set to mixed mode
+        if mode == :mixed || mode == "mixed"
+            # Determine mode based on container presence
+            return self.record_has_top_containers? ? :top_container : :generic
+        end
+
+        # Legacy true/false behavior
+        mode ? :top_container : :generic
+    end
+
+    # Returns true if this record should use the Box-Picker form
+    def use_top_container_form?
+        effective_request_mode == :top_container
+    end
+
+    # Returns true if this record should allow parent traversal
+    def allow_parent_traversal?
+        mode = self.repo_settings.fetch(:top_container_mode, false)
+        # Only traverse parents in false mode or mixed mode when no containers found
+        return false if mode == true
+        return true if mode == false
+        # Mixed mode: only traverse if current record has no containers
+        !self.record_has_top_containers?
     end
 
     def record_has_restrictions?
@@ -526,9 +558,7 @@ class AeonRecordMapper
             return instances
         end
 
-        # If we're in top container mode, we can skip this step, 
-        # since we only want to present containers associated with the current record.
-        if (!self.repo_settings[:top_container_mode])
+        if (self.allow_parent_traversal?)
             parent_uri = ''
 
             if record_json['parent'].present?

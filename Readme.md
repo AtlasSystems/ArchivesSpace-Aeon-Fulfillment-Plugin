@@ -69,6 +69,14 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 ## Changelog
 
+- **20250107**
+    - Added "mixed mode" support to `:top_container_mode` setting
+    - Mixed mode (`:mixed`) allows requests for both records with and without top containers
+    - Records with top containers route to the Box-Picker form
+    - Records without top containers route to the ExternalRequest form
+    - Mixed mode is now the recommended default for new installations
+    - Backwards compatible with existing `true`/`false` configurations
+
 - **20241210**
     - Added example to demonstrate configuration of
     :disallowed_record_level_message, :no_containers_message,
@@ -370,13 +378,51 @@ AppConfig[:aeon_fulfillment] = {
 
 #### `:top_container_mode`
 
-This true/false setting controls whether or not the new top container mode is active for the given repository. This mode has two effects:
+This setting controls how the plugin handles requesting based on the presence of top container data. It accepts three values:
 
-- Only top containers associated with the current record are requestable. If no top containers are associated with the current record, then the request button will be replaced by a message (see :no_containers_message setting below).
+- **`true`** - Only top containers associated with the current record are requestable. If no top containers are associated with the current record, then the request button will be replaced by a message (see `:no_containers_message` setting below). When the user clicks the Aeon Request button, they will be taken to the Aeon Box-Picker form to submit their request(s). This is the best option for large institutions where all requestable materials have been fully processed and assigned to top containers.
 
-- When the user clicks the Aeon Request button, they will be taken to the new Aeon Box-Picker form to submit their request(s).
+- **`false`** - Allows requesting for all records regardless of whether they have top containers. All requests use the generic Aeon ExternalRequest form. If the current record does not have top containers, the plugin will traverse up the resource tree to find container information from parent records. This is the legacy behavior.
 
-If this setting is true, then the :requests_permitted_for_containers_only should also be set to true.
+- **`:mixed` or `"mixed"`** - (RECOMMENDED) Adaptive mode that examines each record individually:
+  - If the record has top containers: routes to the Box-Picker form with container data
+  - If the record has no top containers: routes to the ExternalRequest form with available metadata
+  - Does not traverse to parent records for container information (only uses containers directly associated with the current record)
+  - This mode is ideal for institutions with a mix of processed and unprocessed materials
+
+**Note:** If this setting is `true`, then `:requests_permitted_for_containers_only` should also be set to `true`. If this setting is `:mixed`, the `:requests_permitted_for_containers_only` setting is ignored (effectively false).
+
+**Default:** `false` (for backwards compatibility; `:mixed` is recommended for new installations)
+
+**Example: Mixed mode configuration (recommended for most institutions)**
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
+        :aeon_return_link_label => "Back to ArchivesSpace",
+        :aeon_external_system_id => "ArchivesSpace",
+        :top_container_mode => :mixed,
+        :disallowed_record_level_message => "Not requestable",
+        :restrictions_message => "Access restricted"
+    }
+}
+```
+
+**Example: Top container only mode (for fully processed collections)**
+
+```ruby
+AppConfig[:aeon_fulfillment] = {
+    "repo code" => {
+        :aeon_web_url => "https://your.institution.edu/aeon/aeon.dll",
+        :aeon_return_link_label => "Back to ArchivesSpace",
+        :aeon_external_system_id => "ArchivesSpace",
+        :top_container_mode => true,
+        :requests_permitted_for_containers_only => true,
+        :no_containers_message => "No requestable containers"
+    }
+}
+```
 
 #### `:disallowed_record_level_message`
 

@@ -14,8 +14,14 @@ mapper = AeonRecordMapper.mapper_for(record)
     </div>
   <% else %>
 
-    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?#{mapper.repo_settings.fetch(:top_container_mode, false) ? "action=10&form=35" : ""}", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
-      <% if mapper.repo_settings.fetch(:top_container_mode, false) == false %>
+    <%
+      # Determine which form to use based on mapper's decision
+      use_box_picker = mapper.use_top_container_form?
+      form_params = use_box_picker ? "action=10&form=35" : ""
+    %>
+
+    <%= form_tag "#{mapper.repo_settings[:aeon_web_url]}?#{form_params}", :id => 'aeon_request_sub', :target => (mapper.repo_settings.fetch(:request_in_new_tab, false) ? 'aeon_request' : '_self') do |f| %>
+      <% unless use_box_picker %>
         <input type='hidden' name='AeonForm' value='ExternalRequest' />
       <% end %>
       <% mapper.map.each do |name, value| %>

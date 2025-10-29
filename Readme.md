@@ -69,13 +69,17 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 ## Changelog
 
-- **20250107**
+- **20251028**
     - Added "mixed mode" support to `:top_container_mode` setting
     - Mixed mode (`:mixed`) allows requests for both records with and without top containers
     - Records with top containers route to the Box-Picker form
     - Records without top containers route to the ExternalRequest form
     - Mixed mode is now the recommended default for new installations
     - Backwards compatible with existing `true`/`false` configurations
+    - Fixed nil handling in find_container_instances to handle nil record_json
+    - Fixed circular dependency during mapper initialization in mixed mode
+    - Replaced allow_parent_traversal? call with direct mode check to avoid calling record_has_top_containers? before @container_instances is set
+    - Prevents undefined method `any?' for nil:NilClass error when accessing records without top containers in mixed mode
 
 - **20241210**
     - Added example to demonstrate configuration of

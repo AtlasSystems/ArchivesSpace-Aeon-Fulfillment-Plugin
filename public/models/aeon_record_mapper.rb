@@ -542,7 +542,8 @@ class AeonRecordMapper
     # method will recurse up the record's resource tree, until it finds a record that does
     # have top container instances, and will pull the list of instances from there.
     def find_container_instances (record_json)
-        
+        return [] unless record_json
+
         current_uri = record_json['uri']
         
         Rails.logger.info("Aeon Fulfillment Plugin") { "Checking \"#{current_uri}\" for Top Container instances..." }
@@ -550,7 +551,7 @@ class AeonRecordMapper
             Rails.logger.debug("Aeon Fulfillment Plugin") { "#{record_json.to_json}" }
         end
 
-        instances = record_json['instances']
+        instances = (record_json['instances'] || [])
             .reject { |instance| instance['digital_object'] }
 
         if instances.any?
@@ -558,7 +559,12 @@ class AeonRecordMapper
             return instances
         end
 
-        if (self.allow_parent_traversal?)
+        # Check mode directly instead of calling allow_parent_traversal?
+        # (which depends on @container_instances being set, which we're still initializing)
+        mode = self.repo_settings.fetch(:top_container_mode, false)
+        should_traverse = (mode == false) || (mode == :mixed || mode == "mixed")
+
+        if should_traverse
             parent_uri = ''
 
             if record_json['parent'].present?

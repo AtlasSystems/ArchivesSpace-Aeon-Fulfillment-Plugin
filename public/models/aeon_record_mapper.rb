@@ -160,16 +160,6 @@ class AeonRecordMapper
         effective_request_mode == :top_container
     end
 
-    # Returns true if this record should allow parent traversal
-    def allow_parent_traversal?
-        mode = self.repo_settings.fetch(:top_container_mode, false)
-        # Only traverse parents in false mode or mixed mode when no containers found
-        return false if mode == true
-        return true if mode == false
-        # Mixed mode: only traverse if current record has no containers
-        !self.record_has_top_containers?
-    end
-
     def record_has_restrictions?
         if (types = self.repo_settings[:hide_button_for_access_restriction_types])
             notes = (record.json['notes'] || []).select {|n| n['type'] == 'accessrestrict' && n.has_key?('rights_restriction')}
@@ -559,10 +549,11 @@ class AeonRecordMapper
             return instances
         end
 
-        # Check mode directly instead of calling allow_parent_traversal?
-        # (which depends on @container_instances being set, which we're still initializing)
+        # Check mode directly to avoid circular dependency on @container_instances initialization
+        # Only traverse parents in false mode (generic/legacy mode)
+        # Mixed mode should NOT traverse parents - it only uses containers directly on the current record
         mode = self.repo_settings.fetch(:top_container_mode, false)
-        should_traverse = (mode == false) || (mode == :mixed || mode == "mixed")
+        should_traverse = (mode == false)
 
         if should_traverse
             parent_uri = ''

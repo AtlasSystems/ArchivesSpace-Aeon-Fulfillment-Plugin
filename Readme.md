@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20250617
+**Version:** 20251031
 
-**Last Updated:** June 17, 2025
+**Last Updated:** October 31, 2025
 
 
 ## Table of Contents
@@ -69,7 +69,7 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 ## Changelog
 
-- **20251028**
+- **20251031**
     - Added "mixed mode" support to `:top_container_mode` setting
     - Mixed mode (`:mixed`) allows requests for both records with and without top containers
     - Records with top containers route to the Box-Picker form
@@ -394,7 +394,7 @@ This setting controls how the plugin handles requesting based on the presence of
   - Does not traverse to parent records for container information (only uses containers directly associated with the current record)
   - This mode is ideal for institutions with a mix of processed and unprocessed materials
 
-**Note:** If this setting is `true`, then `:requests_permitted_for_containers_only` should also be set to `true`. If this setting is `:mixed`, the `:requests_permitted_for_containers_only` setting is ignored (effectively false).
+**Note:** If this setting is `true`, then `:requests_permitted_for_containers_only` should also be set to `true`. The `:requests_permitted_for_containers_only` setting works independently of this setting and can be used with any mode to control whether records without top containers are requestable.
 
 **Default:** `false` (for backwards compatibility; `:mixed` is recommended for new installations)
 

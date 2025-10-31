@@ -2,6 +2,13 @@ class AeonRecordMapper
 
     include ManipulateNode
 
+    # Container mode constants for clarity and consistency
+    CONTAINER_MODES = {
+        generic: false,
+        top_container_only: true,
+        mixed: :mixed
+    }.freeze
+
     @@mappers = {}
 
     attr_reader :record, :container_instances
@@ -36,6 +43,13 @@ class AeonRecordMapper
 
     def repo_settings
         AppConfig[:aeon_fulfillment][self.repo_code] || {}
+    end
+
+    # Normalizes the top_container_mode setting to a consistent format
+    # Handles both symbol and string representations (e.g., :mixed and "mixed")
+    def normalized_top_container_mode
+        mode = self.repo_settings.fetch(:top_container_mode, false)
+        mode.is_a?(String) ? mode.to_sym : mode
     end
 
     def user_defined_fields
@@ -124,9 +138,9 @@ class AeonRecordMapper
             return true
         elsif self.requestable_based_on_archival_record_level? == false
             return true
-        elsif self.repo_settings[:requests_permitted_for_containers_only] == true && self.record_has_top_containers? == false
-            return true
-        elsif self.repo_settings[:top_container_mode] == true && self.record_has_top_containers? == false
+        elsif (self.repo_settings[:requests_permitted_for_containers_only] == true ||
+               self.repo_settings[:top_container_mode] == true) &&
+              self.record_has_top_containers? == false
             return true
         elsif self.record_has_restrictions? == true
             return true
@@ -143,10 +157,10 @@ class AeonRecordMapper
     # Returns the effective mode for this specific record
     # :top_container, :generic, or :mixed (only if explicitly set to mixed)
     def effective_request_mode
-        mode = self.repo_settings.fetch(:top_container_mode, false)
+        mode = normalized_top_container_mode
 
         # If explicitly set to mixed mode
-        if mode == :mixed || mode == "mixed"
+        if mode == :mixed
             # Determine mode based on container presence
             return self.record_has_top_containers? ? :top_container : :generic
         end
@@ -551,8 +565,10 @@ class AeonRecordMapper
 
         # Check mode directly to avoid circular dependency on @container_instances initialization
         # Only traverse parents in false mode (generic/legacy mode)
-        # Mixed mode should NOT traverse parents - it only uses containers directly on the current record
+        # Mixed mode (:mixed) and top-container-only mode (true) should NOT traverse parents
         mode = self.repo_settings.fetch(:top_container_mode, false)
+        # Convert string to symbol for consistent comparison
+        mode = mode.to_sym if mode.is_a?(String)
         should_traverse = (mode == false)
 
         if should_traverse

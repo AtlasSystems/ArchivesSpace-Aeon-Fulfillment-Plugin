@@ -360,9 +360,12 @@ class AeonRecordMapper
 
         if (self.record.notes['userestrict'])
             mappings['userestrict'] = self.record.notes['userestrict']
-                .map { |note| note['subnotes'] }.flatten
+                .map { |note| note['subnotes'] }
+                .flatten
+                .compact
                 .select { |subnote| subnote['content'].present? and subnote['publish'] == true }
-                .map { |subnote| subnote['content'] }.flatten
+                .map { |subnote| subnote['content'] }
+                .flatten
                 .join("; ") 
         end
        
@@ -405,6 +408,7 @@ class AeonRecordMapper
                 .select { |note| note['type'] == 'accessrestrict' and note['subnotes'] }
                 .map { |note| note['subnotes'] }
                 .flatten
+                .compact
                 .select { |subnote| subnote['content'].present? and subnote['publish'] == true}
                 .map { |subnote| subnote['content'] }
                 .flatten

@@ -1,8 +1,8 @@
 # ArchivesSpace Request Fulfillment via Aeon
 
-**Version:** 20251031
+**Version:** 20261014
 
-**Last Updated:** October 31, 2025
+**Last Updated:** October 14, 2026
 
 
 ## Table of Contents
@@ -68,6 +68,11 @@ ArchivesSpace may cause changes in the functionality of this plugin.
 
 
 ## Changelog
+
+- **20261014**
+    - Fixed the request button appearing for repositories that are not configured for Aeon (thanks to Jason Jordan, #52)
+    - Fixed an error when a published use or access restriction note contains a sub-note that is not published (thanks to Joshua D. Shaw, #51)
+    - Fixed an empty warning box appearing when the request button is hidden and there is no message to display (#55)
 
 - **20251031**
     - Added "mixed mode" support to `:top_container_mode` setting

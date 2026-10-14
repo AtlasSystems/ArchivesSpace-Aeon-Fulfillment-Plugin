@@ -9,9 +9,12 @@ mapper = AeonRecordMapper.mapper_for(record)
   <%= javascript_include_tag "#{@base_url}/assets/js/aeon_request_action.js" %>
 
   <% if mapper.hide_button? %>
-    <div id="unrequestable-message-wrapper" class="alert alert-warning text-wrap" style="width: 245px; margin-bottom: 0; text-align: center;">
-      <%= mapper.unrequestable_display_message %>
-    </div>
+    <% unrequestable_message = mapper.unrequestable_display_message %>
+    <% if unrequestable_message.present? %>
+      <div id="unrequestable-message-wrapper" class="alert alert-warning text-wrap" style="width: 245px; margin-bottom: 0; text-align: center;">
+        <%= unrequestable_message %>
+      </div>
+    <% end %>
   <% else %>
 
     <%
